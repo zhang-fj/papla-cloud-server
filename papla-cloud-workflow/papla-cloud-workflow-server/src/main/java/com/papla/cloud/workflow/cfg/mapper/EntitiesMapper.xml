@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.workflow.cfg.mapper.EntitiesMapper">
+
+	<sql id="columns">
+		T.APP_ID appId ,
+		T.ENTITY_ID entityId ,
+		T.ENTITY_CODE entityCode ,
+		T.ENTITY_NAME entityName ,
+		T.ENTITY_DESC entityDesc ,
+		T.FUNC_TYPE funcType ,
+		T.FUNC_VALUE funcValue ,
+		T.BUS_TABLE_NAME busTableName ,
+		T.BUS_TABLE_PK busTablePk ,
+		T.AUTH_USER_CLS authUserCls ,
+		T.ENABLED enabled ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_wf_entities T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.workflow.cfg.domain.Entities" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_wf_entities T where 1=1
+		<if test="appId != null and appId != ''"> and T.APP_ID = #{appId,jdbcType=VARCHAR}</if>
+		<if test="entityCode != null and entityCode != ''"> and T.ENTITY_CODE like concat('%',#{entityCode,jdbcType=VARCHAR},'%')</if>
+		<if test="entityName != null and entityName != ''"> and T.ENTITY_NAME like concat('%',#{entityName,jdbcType=VARCHAR},'%')</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.workflow.cfg.domain.Entities" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_entities T
+		where  T.ENTITY_ID = #{entityId,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.workflow.cfg.domain.Entities" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_entities T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.workflow.cfg.domain.Entities">
+		insert into papla_wf_entities
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="appId != null">APP_ID,</if>
+	 		<if test="entityId != null">ENTITY_ID,</if>
+	 		<if test="entityCode != null">ENTITY_CODE,</if>
+	 		<if test="entityName != null">ENTITY_NAME,</if>
+	 		<if test="entityDesc != null">ENTITY_DESC,</if>
+	 		<if test="funcType != null">FUNC_TYPE,</if>
+	 		<if test="funcValue != null">FUNC_VALUE,</if>
+	 		<if test="busTableName != null">BUS_TABLE_NAME,</if>
+	 		<if test="busTablePk != null">BUS_TABLE_PK,</if>
+	 		<if test="authUserCls != null">AUTH_USER_CLS,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="appId != null">#{appId,jdbcType=VARCHAR},</if>
+			<if test="entityId != null">#{entityId,jdbcType=VARCHAR},</if>
+			<if test="entityCode != null">#{entityCode,jdbcType=VARCHAR},</if>
+			<if test="entityName != null">#{entityName,jdbcType=VARCHAR},</if>
+			<if test="entityDesc != null">#{entityDesc,jdbcType=VARCHAR},</if>
+			<if test="funcType != null">#{funcType,jdbcType=VARCHAR},</if>
+			<if test="funcValue != null">#{funcValue,jdbcType=VARCHAR},</if>
+			<if test="busTableName != null">#{busTableName,jdbcType=VARCHAR},</if>
+			<if test="busTablePk != null">#{busTablePk,jdbcType=VARCHAR},</if>
+			<if test="authUserCls != null">#{authUserCls,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.workflow.cfg.domain.Entities">
+		update papla_wf_entities T
+		<set>
+			<if test="appId != null">APP_ID = #{appId,jdbcType=VARCHAR},</if>
+			<if test="entityId != null">ENTITY_ID = #{entityId,jdbcType=VARCHAR},</if>
+			<if test="entityCode != null">ENTITY_CODE = #{entityCode,jdbcType=VARCHAR},</if>
+			<if test="entityName != null">ENTITY_NAME = #{entityName,jdbcType=VARCHAR},</if>
+			<if test="entityDesc != null">ENTITY_DESC = #{entityDesc,jdbcType=VARCHAR},</if>
+			<if test="funcType != null">FUNC_TYPE = #{funcType,jdbcType=VARCHAR},</if>
+			<if test="funcValue != null">FUNC_VALUE = #{funcValue,jdbcType=VARCHAR},</if>
+			<if test="busTableName != null">BUS_TABLE_NAME = #{busTableName,jdbcType=VARCHAR},</if>
+			<if test="busTablePk != null">BUS_TABLE_PK = #{busTablePk,jdbcType=VARCHAR},</if>
+			<if test="authUserCls != null">AUTH_USER_CLS = #{authUserCls,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ENTITY_ID = #{entityId,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_wf_entities where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_wf_entities where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ENTITY_ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.workflow.cfg.domain.Entities">
+		delete from papla_wf_entities 
+		where  ENTITY_ID = #{entityId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

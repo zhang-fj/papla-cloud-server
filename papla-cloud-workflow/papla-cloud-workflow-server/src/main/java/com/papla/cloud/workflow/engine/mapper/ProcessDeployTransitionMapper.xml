@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployTransitionMapper">
+
+    <!-- 批量保存【流程连线】信息 -->
+    <insert id="saveTransitions" parameterType="java.util.List">
+        insert into papla_wf_deploy_act_trans(transition_id,transition_code,transition_name,transition_category,
+        func_type,func,from_act_id,to_act_id,process_id,deploy_id,create_dt,create_by,line_num,biz_status)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.id,jdbcType=VARCHAR},
+            #{item.code,jdbcType=VARCHAR},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.type,jdbcType=VARCHAR},
+            #{item.funcType,jdbcType=VARCHAR},
+            #{item.funcName,jdbcType=VARCHAR},
+            #{item.fromActId,jdbcType=INTEGER},
+            #{item.toActId,jdbcType=INTEGER},
+            #{item.processId,jdbcType=VARCHAR},
+            #{item.deployId,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=DATE},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.lineNum,jdbcType=INTEGER},
+            #{item.bizStatus,jdbcType=VARCHAR}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 根据【流程部署ID】获取【流程连线】列表  -->
+    <select id="getTransitionsByDeployId" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.TransitionBean">
+        select t.transition_id id,
+        t.deploy_id deployId,
+        t.process_id processId,
+        t.transition_code code,
+        t.transition_name name,
+        t.transition_alias,
+        t.transition_category type,
+        t.transition_category category,
+        t.func_type funcType,
+        t.func funcName,
+        t.from_act_id fromActId,
+        t.to_act_id toActId,
+        t.line_num lineNum,
+        t.biz_status bizStatus,
+        t.create_dt createDate,
+        t.create_by createBy,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_act_trans t
+        where t.deploy_id = #{deployId}
+        order by t.line_num
+    </select>
+
+    <!-- 根据【流程部署ID】和【迁出节点ID】获取【流程连线】列表  -->
+    <select id="getTransitionList" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.TransitionBean">
+        select tr.process_id processId,
+        tr.deploy_id deployId,
+        tr.transition_id id,
+        tr.transition_code code,
+        tr.transition_name name,
+        tr.func_type funcType,
+        tr.func funcName,
+        tr.transition_category category,
+        tr.transition_category type,
+        tr.from_act_id fromActId,
+        tr.to_act_id toActId,
+        tr.line_num lineNum,
+        tr.biz_status bizStatus,
+        tr.create_by createBy,
+        tr.update_by updateBy,
+        tr.create_dt createDate,
+        tr.update_dt updateDt
+        from papla_wf_deploy_act_trans tr
+        where tr.deploy_id = #{deployId}
+        and tr.from_act_id = #{fromActId}
+    </select>
+
+    <!-- 根据【流程实例ID】和【迁出节点ID】获取【流程连线】信息 -->
+    <select id="getTransitionBean" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.TransitionBean">
+        select
+        ri.instance_id instanceId,
+        tr.process_id processId,
+        tr.deploy_id deployId,
+        tr.transition_id id,
+        tr.transition_code code,
+        tr.transition_name name,
+        tr.func_type funcType,
+        tr.func funcName,
+        tr.transition_category category,
+        tr.transition_category type,
+        tr.from_act_id fromActId,
+        tr.to_act_id toActId,
+        tr.line_num lineNum,
+        tr.biz_status bizStatus,
+        tr.create_by createBy,
+        tr.update_by updateBy,
+        tr.create_dt createDate,
+        tr.update_dt updateDt
+        from papla_wf_deploy_act_trans tr,papla_wf_run_instance ri
+        WHERE ri.deploy_id = tr.deploy_id
+        and ri.instance_id = #{instanceId}
+        and tr.transition_code = #{lineCode}
+    </select>
+
+</mapper>

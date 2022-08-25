@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ApplicationMapper">
+
+    <!-- 根据流程ID, 查找应用信息 -->
+    <select id="getApplicationByProcId" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ApplicationBean">
+        select
+            app.app_id appId,
+            app.app_code appCode,
+            app.app_name appName,
+            app.app_desc appDesc,
+            app.enabled enableFlag,
+            app.web_host webHost,
+            app.web_port webPort,
+            app.web_project webProject,
+            app.db_type dbType,
+            app.DB_URL dbUrl,
+            app.db_user dbUser,
+            app.db_password dbPassword,
+            app.create_dt createDt,
+            app.create_by createdBy,
+            app.update_dt updateDt,
+            app.update_by updateBy
+        from papla_wf_proc_design wpd, papla_wf_apps app
+        where app.app_id = wpd.app_id
+        and wpd.process_id = #{processId}
+    </select>
+
+    <!-- 根据流程ID, 查找应用信息 -->
+    <select id="getApplicationParams" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ApplicationParamBean">
+        select
+            T.PARAM_CODE paramCode ,
+            T.PARAM_NAME paramName ,
+            T.PARAM_VALUE paramValue
+        from papla_wf_app_param T where T.APP_ID = #{appId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

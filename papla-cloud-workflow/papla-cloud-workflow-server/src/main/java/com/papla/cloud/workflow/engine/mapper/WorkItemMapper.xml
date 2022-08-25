@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.WorkItemMapper">
+
+    <!-- 结果集合映射  -->
+    <resultMap type="com.papla.cloud.workflow.engine.modal.WorkItemBean" id="WorkItemMap">
+        <result property="taskId" column="task_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processVersion" column="process_version"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="instanceCode" column="instance_code"/>
+        <result property="actId" column="act_id"/>
+        <result property="actCode" column="act_code"/>
+        <result property="actName" column="act_name"/>
+        <result property="taskTitle" column="task_title"/>
+        <result property="fromUser" column="from_user"/>
+        <result property="fromUserName" column="fromUserName"/>
+        <result property="assignUser" column="assign_user"/>
+        <result property="assignUserName" column="assignUserName"/>
+        <result property="executeUser" column="execute_user"/>
+        <result property="executeUserName" column="executeUserName"/>
+        <result property="taskState" column="task_state"/>
+        <result property="fromTaskId" column="from_task_id"/>
+        <result property="beginDate" column="begin_date" jdbcType="TIMESTAMP"/>
+        <result property="endDate" column="end_date" jdbcType="TIMESTAMP"/>
+        <result property="result" column="result"/>
+        <result property="approveCommnet" column="approve_comment"/>
+        <result property="comment" column="comment"/>
+        <result property="description" column="description"/>
+        <result property="closeCause" column="close_cause"/>
+        <result property="createType" column="create_type"/>
+        <result property="taskEffective" column="task_effective"/>
+        <result property="createDt" column="create_dt" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateDt" column="update_dt" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isCustomTask" column="is_custom_task"/>
+        <result property="isTimeoutTask" column="is_timeout_task"/>
+        <result property="authSrc" column="auth_src"/>
+        <result property="authSrcId" column="auth_src_id"/>
+        <result property="taskOwner" column="task_owner"/>
+    </resultMap>
+
+    <!-- 重用SQL语句列  -->
+    <sql id="itemColumn">
+        task_id ,
+        process_id ,
+        process_code ,
+        process_version ,
+        instance_id ,
+        instance_code ,
+        act_id ,
+        act_code ,
+        act_name ,
+        task_title ,
+        from_user ,
+        assign_user ,
+        execute_user ,
+        task_state ,
+        from_task_id ,
+        begin_date ,
+        end_date ,
+        result ,
+        approve_comment ,
+        comment,
+        description ,
+        close_cause ,
+        create_type ,
+        task_effective ,
+        create_dt ,
+        create_by ,
+        update_dt ,
+        update_by,
+        is_custom_task,
+        is_timeout_task,
+        auth_src,
+        auth_src_id,
+        task_owner
+    </sql>
+
+    <!--创建一条待办信息  -->
+    <insert id="createWorkItem" parameterType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        insert into papla_wf_run_ins_task(
+        task_id,
+        deploy_id,
+        process_id,
+        process_code,
+        process_version,
+        instance_id,
+        instance_code,
+        act_id,
+        act_code,
+        act_name,
+        task_title,
+        from_user,
+        assign_user,
+        execute_user,
+        task_state,
+        from_task_id,
+        begin_date ,
+        end_date,
+        result,
+        approve_comment,
+        description,
+        close_cause,
+        create_type,
+        comment,
+        auth_src,
+        auth_src_id,
+        task_owner,
+        create_dt,
+        create_by,
+        is_custom_task,
+        is_timeout_task
+        ) values(
+        #{taskId,jdbcType=VARCHAR},
+        #{deployId,jdbcType=VARCHAR},
+        #{processId,jdbcType=VARCHAR},
+        #{processCode,jdbcType=VARCHAR},
+        #{processVersion,jdbcType=VARCHAR},
+        #{instanceId,jdbcType=VARCHAR},
+        #{instanceCode,jdbcType=VARCHAR},
+        #{actId,jdbcType=VARCHAR},
+        #{actCode,jdbcType=VARCHAR},
+        #{actName,jdbcType=VARCHAR},
+        #{taskTitle,jdbcType=VARCHAR},
+        #{fromUser,jdbcType=VARCHAR},
+        #{assignUser,jdbcType=VARCHAR},
+        #{executeUser,jdbcType=VARCHAR},
+        #{taskState,jdbcType=VARCHAR},
+        #{fromTaskId,jdbcType=VARCHAR},
+        #{beginDate,jdbcType=TIMESTAMP},
+        #{endDate,jdbcType=TIMESTAMP},
+        #{result,jdbcType=VARCHAR},
+        #{approveCommnet,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{closeCause,jdbcType=VARCHAR},
+        #{createType,jdbcType=VARCHAR},
+        #{comment,jdbcType=VARCHAR},
+        #{authSrc,jdbcType=VARCHAR},
+        #{authSrcId,jdbcType=VARCHAR},
+        #{taskOwner,jdbcType=VARCHAR},
+        <choose>
+            <when test="dbType == 'oracle' ">
+                sysdate,
+                #{createBy,jdbcType=VARCHAR},
+                NVL(#{isCustomTask,jdbcType=VARCHAR},'N'),
+                NVL( #{isTimeoutTask,jdbcType=VARCHAR},'N')
+            </when>
+            <when test="dbType == 'mysql' ">
+                CURRENT_TIMESTAMP(),
+                #{createBy,jdbcType=VARCHAR},
+                IFNULL(#{isCustomTask,jdbcType=VARCHAR},'N'),
+                IFNULL( #{isTimeoutTask,jdbcType=VARCHAR},'N')
+            </when>
+        </choose>
+        )
+    </insert>
+
+    <!--修改待办信息  -->
+    <update id="modifyWorkItem" parameterType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        update papla_wf_run_ins_task
+        set act_name = #{actName},
+        task_title = #{taskTitle},
+        from_user = #{fromUser},
+        assign_user = #{assignUser},
+        execute_user = #{executeUser},
+        task_state = #{taskState},
+        from_task_id = #{fromTaskId,jdbcType=VARCHAR},
+        end_date = #{endDate,jdbcType=TIMESTAMP},
+        result = #{result,jdbcType=VARCHAR},
+        approve_comment = #{approveCommnet,jdbcType=VARCHAR},
+        description = #{description,jdbcType=VARCHAR},
+        close_cause = #{closeCause,jdbcType=VARCHAR},
+        create_type = #{createType,jdbcType=VARCHAR},
+        comment = #{comment,jdbcType=VARCHAR},
+        closed_line_type = #{closedLineType,jdbcType=VARCHAR},
+        update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        update_by = #{updateBy,jdbcType=VARCHAR}
+        where task_id = #{taskId}
+    </update>
+
+    <!-- 批量更新实例下的待办信息 -->
+    <update id="updateWorkItem" parameterType="java.util.Map">
+        update papla_wf_run_ins_task t
+        <set>
+            <if test="taskEffective != null">t.task_effective = #{taskEffective,jdbcType=VARCHAR},</if>
+            <if test="taskState != null">t.task_state = #{taskState,jdbcType=VARCHAR},</if>
+            <if test="endDate != null">t.end_date = #{endDate,jdbcType=VARCHAR},</if>
+            <if test="result != null">t.result = #{result,jdbcType=VARCHAR},</if>
+            <if test="closeCause != null">t.close_cause = #{closeCause,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">t.update_dt = #{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">t.update_by = #{updateBy,jdbcType=VARCHAR},</if>
+        </set>
+        where t.task_effective = 'Y'
+        <if test="currentInstanceId != null">and t.instance_id = #{currentInstanceId}</if>
+        <if test="currentActId != null">and t.act_id = #{currentActId}</if>
+        <if test="currentState != null">and t.task_state = #{currentState}</if>
+        <if test="currentTaskId != null">and t.task_id != #{currentTaskId}</if>
+        <if test=" createType == 'start' or createType == 'copyto' or createType == 'consult' ">
+            and t.create_type = #{createType}
+            and t.task_state = 'open'
+        </if>
+        <if test=" createType == 'normal' ">
+            and t.create_type = #{createType}
+            and t.task_state in ('open','hung-up')
+        </if>
+        <if test=" actIds != null and actIds.size > 0">
+            <foreach collection="actIds" index="index" item="item" open="t.actId in (" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="targetActId != null">
+            and t.begin_date >= select min(c.BEGIN_DATE)
+            from (select d.BEGIN_DATE from papla_wf_run_ins_task d
+            where d.ACT_ID = #{targetActId}
+            and d.INSTANCE_ID = #{currentInstanceId}
+            and d.task_effective = 'Y') c)
+
+        </if>
+
+    </update>
+
+    <!-- 查询节点迁出线集合 -->
+    <select id="getMoveOutTransitions" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.TransitionBean">
+        select it.instance_id instanceId,
+        t.transition_id id,
+        t.process_id processId,
+        t.transition_code code,
+        t.transition_name name,
+        t.transition_category category,
+        t.func_type funcType,
+        t.func funcName,
+        t.from_act_id fromActId,
+        t.to_act_id toActId,
+        t.line_num lineNum,
+        t.BIZ_STATUS bizStatus,
+        t.create_dt createDate,
+        t.create_by createBy,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_act_trans t,papla_wf_deploy_acts da,papla_wf_run_ins_task it
+        where t.deploy_id=da.deploy_id
+        and t.from_act_id=da.act_num
+        and da.deploy_id = it.deploy_id
+        and da.act_id = it.act_id
+        and it.task_id = #{taskId}
+        order by transition_category desc
+    </select>
+
+    <!--查询审批历史信息  -->
+    <select id="getWorkItemList" parameterType="java.util.Map" resultMap="WorkItemMap">
+        select tsk.task_id ,
+            tsk.process_id ,
+            tsk.process_code ,
+            tsk.process_version ,
+            tsk.instance_id ,
+            tsk.instance_code ,
+            tsk.act_id ,
+            tsk.act_code ,
+            tsk.act_name ,
+            tsk.task_title ,
+            tsk.from_user ,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.from_user) fromUserName,
+            tsk.assign_user ,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.assign_user) assignUserName,
+            tsk.execute_user ,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.execute_user) executeUserName,
+            tsk.task_state ,
+            tsk.from_task_id ,
+            tsk.begin_date ,
+            tsk.end_date ,
+            tsk.result ,
+            tsk.approve_comment ,
+            tsk.comment,
+            tsk.description ,
+            tsk.close_cause ,
+            tsk.create_type ,
+            tsk.task_effective,
+            tsk.create_dt ,
+            tsk.create_by ,
+            tsk.update_dt ,
+            tsk.update_by
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_ins_task
+            </when>
+            <otherwise>
+                papla_wf_run_ins_task
+            </otherwise>
+        </choose>
+        tsk
+        where tsk.instance_id = #{instanceId}
+        <if test="createType == 'notcopyto'">
+            and tsk.create_type != 'copyto'
+        </if>
+        order by create_dt
+    </select>
+
+    <select id="getUserTaskList" parameterType="java.util.Map" resultMap="WorkItemMap">
+        select
+            tsk.task_id,
+            tsk.task_title,
+            tsk.task_state,
+            tsk.act_id,
+            tsk.act_code,
+            tsk.act_name,
+            tsk.from_user,
+            tsk.assign_user,
+            tsk.execute_user,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.from_user) FROMUSERNAME,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.assign_user) ASSIGNUSERNAME,
+            (select distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = tsk.execute_user) EXECUTEUSERNAME,
+            pi.business_id,
+            pi.business_code,
+            pi.business_name,
+            e.entity_id,
+            e.entity_code,
+            e.entity_name,
+            tsk.begin_date,
+            tsk.end_date,
+            pi.instance_id,
+            pi.instance_code,
+            tsk.process_id,
+            tsk.process_code,
+            tsk.create_by,
+            tsk.approve_comment,
+            tsk.close_cause
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_ins_task tsk, papla_wf_arch_instance pi,
+            </when>
+            <otherwise>
+                papla_wf_run_ins_task tsk, papla_wf_run_instance pi,
+            </otherwise>
+        </choose>
+        papla_wf_entities e
+        where tsk.instance_id = pi.instance_id
+        and pi.entity_id = e.entity_id
+        and (tsk.assign_user = #{userId} or tsk.execute_user = #{userId} )
+        <choose>
+            <when test='states != null and states.size > 0 '>
+                <foreach collection="states" item="state" separator="," open="and tsk.task_state in(" close=")">
+                    #{state,jdbcType=VARCHAR}
+                </foreach>
+            </when>
+            <otherwise>
+                and tsk.task_state = 'closed'
+            </otherwise>
+        </choose>
+        and tsk.task_effective = 'Y'
+        order by tsk.begin_date desc
+    </select>
+
+    <!-- 查询单条待办信息 -->
+    <select id="getWorkItemTaskId" parameterType="java.lang.String" resultMap="WorkItemMap">
+        select
+        <include refid="itemColumn"/>
+        from papla_wf_run_ins_task where task_id = #{taskId}
+    </select>
+
+    <!-- 查询单条归档待办信息 -->
+    <select id="getArchedWorkItemTaskId" parameterType="java.lang.String" resultMap="WorkItemMap">
+        select
+        <include refid="itemColumn"/>
+        from work_flow_arch_task
+        where task_id = #{taskId}
+    </select>
+
+    <!-- 查询单条待办信息(含实例信息) -->
+    <select id="getWorkItemAndInstance" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        select xt.task_id taskId,
+        xt.begin_date beginDate,
+        xt.task_title taskTitle,
+        xt.task_state taskState,
+        xi.business_id businessId,
+        xi.instance_id instanceId,
+        xt.instance_code instanceCode,
+        (select b.emp_name
+        from xip_pub_users a, xip_pub_emps b
+        where a.emp_id = b.emp_id
+        and a.user_id = xt.from_user) fromUserName,
+        xt.comment
+        from papla_wf_run_ins_task xt, papla_wf_run_instance xi
+        where xt.instance_id = xi.instance_id
+        and xt.task_id = #{taskId}
+    </select>
+
+    <!--根据待办Id, 查询实例信息  -->
+    <select id="getIdListByTaskId" parameterType="java.lang.String" resultType="java.util.Map">
+        select instance_id INSID,deploy_id DEPLOYID, process_id PROCESSID, act_id ACTID, instance_code INSCODE
+        from papla_wf_run_ins_task
+        where task_id = #{taskId}
+    </select>
+
+    <!--根据待办Id, 查询归档实例信息  -->
+    <select id="getArchIdListByTaskId" parameterType="java.lang.String" resultType="java.util.Map">
+        select instance_id INSID, process_id PROCESSID, act_id ACTID, instance_code INSCODE
+        from work_flow_arch_task
+        where task_id = #{taskId}
+    </select>
+
+    <!-- 查询流程关联表单信息 -->
+    <select id="getFormById" parameterType="java.lang.String" resultType="java.lang.String">
+        select t.form_url url from papla_wf_entity_forms t where t.form_id = #{formId}
+    </select>
+
+    <!-- 根据当前待办ID, 取得其对应的征询待办ID -->
+    <select id="getConsultTaskId" parameterType="java.lang.String" resultType="java.lang.String">
+        select t.task_id taskId from papla_wf_run_ins_task t where t.from_task_id = #{taskId} and t.task_state = 'open'
+    </select>
+
+    <!-- 取得假期规则信息 -->
+    <select id="getHolidayRule" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.HolidayRuleBean">
+        select t.privilege_id privilegeId,
+        t.master_user_id masterUserId,
+        t.proxy_user_id proxyUserId,
+        t.begin_date beginDate,
+        t.end_date endDate
+        from papla_wf_user_holiday t
+        where t.master_user_id in
+        <foreach collection="executors" index="index" open="(" close=")" separator="," item="item">
+            #{item.userId}
+        </foreach>
+        <choose>
+            <when test="dbType == 'oracle' ">
+                <![CDATA[
+			    and t.end_date >= sysdate
+			    and t.begin_date <= sysdate
+			    and t.enabled = 'Y'
+			  ]]>
+            </when>
+            <when test="dbType == 'mysql' ">
+                <![CDATA[
+			    and t.end_date >= CURRENT_TIMESTAMP()
+			    and t.begin_date <= CURRENT_TIMESTAMP()
+			    and t.enabled = 'Y'
+			  ]]>
+            </when>
+        </choose>
+    </select>
+
+    <!-- 取得可能超时的待办信息  -->
+    <select id="findTimeoutWorkItem" resultType="com.papla.cloud.workflow.engine.modal.TimeOutBean">
+        select distinct t.process_id processId,
+        t.instance_id instanceId,
+        t.act_id actId,
+        b.act_category actType,
+        t.begin_date beginDate,
+        a.property_value days,
+        t.ASSIGN_USER assignUserId,
+        t.TASK_ID taskId
+        from papla_wf_run_ins_task t, work_flow_ins_act_attrs a, work_flow_ins_acts b
+        where t.instance_id = a.instance_id
+        and a.instance_id = b.instance_id
+        and t.act_id = a.act_id
+        and a.act_id = b.act_id
+        and b.act_category in ('Notice','Countersign')
+        and t.task_state = 'open'
+        and a.property_code = 'a_timeout_days'
+        and t.is_timeout_task = 'Y'
+    </select>
+
+    <!-- 根据待办ID列表获取待办列表信息 -->
+    <select id="getWorkItemByTaskIds" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        select t.process_id processId, t.process_version processVersion, t.act_id actId
+        from papla_wf_run_ins_task t
+        where t.task_id in
+        <foreach collection="array" open="(" close=")" index="index" item="item" separator=",">
+            #{item}
+        </foreach>
+        group by t.process_id, t.process_version, t.act_id
+    </select>
+
+    <!-- 根据实例和节点ID获取待办信息 -->
+    <select id="getWorkItemByInsAndAct" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        select *
+        from (select t.task_id taskId,
+        t.task_title taskTitle,
+        t.process_id processId,
+        t.process_version processVersion,
+        t.assign_user assignUser,
+        t.execute_user executeUser,
+        <choose>
+            <when test=" dbType=='oracle' ">
+                (select b.emp_code ||'-'|| b.emp_name
+                from xip_pub_users a, xip_pub_emps b
+                where a.emp_id = b.emp_id
+                and a.user_id = t.assign_user) assignUserName,
+
+                (select b.emp_code ||'-'|| b.emp_name
+                from xip_pub_users a, xip_pub_emps b
+                where a.emp_id = b.emp_id
+                and a.user_id = t.execute_user) executeUserName
+            </when>
+            <when test=" dbType == 'mysql' ">
+                (select concat(b.emp_code,'-',b.emp_name)
+                from xip_pub_users a, xip_pub_emps b
+                where a.emp_id = b.emp_id
+                and a.user_id = t.assign_user) assignUserName,
+
+                (select concat(b.emp_code,'-',b.emp_name)
+                from xip_pub_users a, xip_pub_emps b
+                where a.emp_id = b.emp_id
+                and a.user_id = t.execute_user) executeUserName
+            </when>
+        </choose>
+        from papla_wf_run_ins_task t
+        where t.task_state = 'open'
+        and t.act_id = #{actId}
+        and t.instance_code = #{insCode}
+        ) tsk
+        where tsk.assignUserName like '%${assignUser}%'
+        and tsk.executeUserName like '%${execUser}%'
+    </select>
+
+    <!-- 修改待办的所有人或执行人信息 -->
+    <update id="updateWorkItemUsers" parameterType="java.util.Map">
+        update papla_wf_run_ins_task t
+        set t.update_dt = #{cdate,jdbcType=TIMESTAMP},
+        t.update_by = #{userId,jdbcType=VARCHAR}
+        <if test="flag == 1 ">
+            t.assign_user = #{assignUserNew,jdbcType=VARCHAR}
+        </if>
+        <if test="flag == 2">
+            t.execute_user = #{executeUserNew,jdbcType=VARCHAR}
+        </if>
+        where t.instance_id in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and t.act_id = #{actId}
+        <if test="flag == 1 ">
+            and t.assign_user = #{assignUser}
+        </if>
+        <if test="flag == 2">
+            and t.execute_user = #{executeUser}
+        </if>
+    </update>
+
+    <!-- 获取假期规则信息 -->
+    <select id="getHolidayRulesById" parameterType="java.util.List" resultType="com.papla.cloud.workflow.engine.modal.HolidayRuleBean">
+        select t.privilege_id privilegeId,
+        t.master_user_id masterUserId,
+        t.proxy_user_id proxyUserId,
+        t.begin_date beginDate,
+        t.end_date endDate
+        from papla_wf_user_holiday t
+        where t.privilege_id in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 撤回假期待办信息 -->
+    <select id="revokeHolidayTasks" parameterType="java.util.Map">
+        update papla_wf_run_ins_task t
+        set t.EXECUTE_USER = t.ASSIGN_USER,
+        t.update_dt = #{cdate,jdbcType=TIMESTAMP},
+        t.update_by = #{userId,jdbcType=VARCHAR}
+        where t.TASK_STATE = 'open'
+        and t.ATTRIBUTE7 = 'papla_wf_user_holiday'
+        and t.ATTRIBUTE8 IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 查询汇总提醒待办信息  -->
+    <select id="getTotalNoticeTasks" resultType="java.util.HashMap">
+        <![CDATA[
+			select * from (
+			      select tsk.TASK_ID,
+			             tsk.TASK_TITLE,
+			             tsk.CREATE_TYPE,
+			             tsk.ASSIGN_USER REC_USR_ID,
+			             xe.EMAIL,
+			             xe.PHONE_NO,
+			             (select b.emp_name from xip_pub_users a, xip_pub_emps b where a.emp_id = b.emp_id and a.user_id = xi.create_by) SUBMITTER
+			        from papla_wf_run_ins_task         tsk,
+			             xip_pub_users           xu,
+			             xip_pub_emps            xe,
+			             papla_wf_run_instance xi
+			       where tsk.ASSIGN_USER = xu.USER_ID
+			         and xu.emp_id = xe.emp_id
+			         and tsk.INSTANCE_ID = xi.INSTANCE_ID
+			         and tsk.TASK_STATE = 'open'
+			      union
+			      select tsk.TASK_ID,
+			             tsk.TASK_TITLE,
+			             tsk.CREATE_TYPE,
+			             tsk.EXECUTE_USER REC_USR_ID,
+			             xe.EMAIL,
+			             xe.PHONE_NO,
+			             (select b.emp_name from xip_pub_users a, xip_pub_emps b where a.emp_id = b.emp_id and a.user_id = xi.create_by) SUBMITTER
+			        from papla_wf_run_ins_task         tsk,
+			             xip_pub_users           xu,
+			             xip_pub_emps            xe,
+			             papla_wf_run_instance xi
+			       where tsk.EXECUTE_USER = xu.USER_ID
+			         and xu.emp_id = xe.emp_id
+			         and tsk.INSTANCE_ID = xi.INSTANCE_ID
+			         and tsk.ASSIGN_USER <> tsk.EXECUTE_USER
+			         and tsk.TASK_STATE = 'open'
+					) tmp
+				order by tmp.REC_USR_ID	
+	 	]]>
+    </select>
+
+    <!-- 查询实例下历史待办信息   and t.task_effective = 'Y' -->
+    <select id="getHisTasks" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+            t.ACT_NAME,
+            (SELECT distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = t.assign_user) ASSIGNUSERNAME,
+            (SELECT distinct ui.emp_name from papla_wf_user_info ui where ui.user_id = = t.execute_user) EXECUTEUSERNAME,
+            t.APPROVE_COMMENT,
+            t.RESULT
+        FROM papla_wf_run_ins_task t
+        WHERE
+        t.instance_id = #{instanceId}
+        AND t.create_type != 'copyto'
+        ORDER BY
+        t.begin_date,
+        t.end_date
+    </select>
+
+    <!-- 查询已经发送了待办的人员信息 -->
+    <select id="getHasSendExecutors" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select t.ASSIGN_USER,t.EXECUTE_USER
+        from papla_wf_run_ins_task t
+        where t.INSTANCE_ID = #{insId}
+        and t.ACT_ID = #{actId}
+        and t.BEGIN_DATE =
+        (select max(b.BEGIN_DATE)
+        from (select a.BEGIN_DATE
+        from papla_wf_run_ins_task a
+        where a.INSTANCE_ID = #{insId}
+        and a.ACT_ID = #{actId}
+        and a.CREATE_TYPE in ('normal','avoid')
+        and a.TASK_EFFECTIVE = 'Y') b)
+    </select>
+
+    <!-- 删除流程实例下所有的待办信息 -->
+    <delete id="deleteAllTaskByInsId" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_task where instance_id = #{insId}
+    </delete>
+
+    <!-- 查询逾期未审批的待办 -->
+    <update id="revokeAcrossTasks" parameterType="java.util.HashMap">
+        <choose>
+            <when test="dbType == 'oracle' ">
+                update papla_wf_run_ins_task t
+                set t.EXECUTE_USER = t.ASSIGN_USER,
+                t.update_dt = sysdate
+                where t.TASK_STATE = 'open'
+                and t.ATTRIBUTE7 = 'papla_wf_user_holiday'
+                and exists (select 1 from papla_wf_user_holiday uh
+                where t.ATTRIBUTE8 = uh.PRIVILEGE_ID
+                <![CDATA[
+				           and uh.END_DATE < sysdate
+						 ]]>
+                )
+            </when>
+            <when test="dbType == 'mysql' ">
+                update papla_wf_run_ins_task t
+                set t.EXECUTE_USER = t.ASSIGN_USER,
+                t.update_dt = CURRENT_TIMESTAMP()
+                where t.TASK_STATE = 'open'
+                and t.ATTRIBUTE7 = 'papla_wf_user_holiday'
+                and exists (select 1
+                from papla_wf_user_holiday uh
+                where t.ATTRIBUTE8 = uh.PRIVILEGE_ID
+                <![CDATA[
+				           and uh.END_DATE < CURRENT_TIMESTAMP()
+						 ]]>
+                )
+            </when>
+        </choose>
+    </update>
+
+</mapper>

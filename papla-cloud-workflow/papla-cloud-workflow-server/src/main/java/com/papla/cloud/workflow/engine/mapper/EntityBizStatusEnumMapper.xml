@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.EntityBizStatusEnumMapper">
+
+    <!-- 根据参数查询【业务实体】业务状态列表 -->
+    <select id="getEntityBizStatusList" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.BizStatusEnumBean">
+        select b.enum_id enumId,
+        b.entity_id entityId,
+        b.status_category statusCateGory,
+        b.status_code statusCode,
+        b.status_name statusName,
+        b.status_desc statusDesc,
+        b.enabled enabled
+        from papla_wf_entity_status_enum b
+        where b.enabled = 'Y'
+        and b.entity_id = #{entityId}
+        <if test="category !=null and category != ''">and b.status_category = #{category}</if>
+        <if test="statusName !=null and statusName != ''">and b.status_desc like '%${statusName}%'</if>
+    </select>
+
+</mapper>

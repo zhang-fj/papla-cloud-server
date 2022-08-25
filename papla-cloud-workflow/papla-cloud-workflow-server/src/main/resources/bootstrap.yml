@@ -1,0 +1,54 @@
+server:
+  port: 8895
+spring:
+  profiles:
+    active: dev
+  application:
+    name: papla-cloud-workflow-server
+  cloud:
+    nacos:
+      discovery:
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+        server-addr: ${nacos-host:localhost}:${nacos-port:8848}
+        #nacos的命名空间ID，默认是public
+        namespace: ${nacos-namespace:}
+        group: PAPLA_CLOUD_GROUP
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        namespace: ${spring.cloud.nacos.discovery.namespace}
+        group: ${spring.cloud.nacos.discovery.group}
+        file-extension: yaml
+        #指定共享配置，且支持动态刷新
+        extension-configs:
+          - data-id: papla-wf-datasource.yaml
+            group: ${spring.cloud.nacos.config.group}
+            refresh: true
+          - data-id: common.yaml
+            group: ${spring.cloud.nacos.config.group}
+            refresh: true
+  redis:
+    #数据库索引
+    database: ${REDIS_DB:1}
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:16379}
+    password: ${REDIS_PWD:zfj@026418}
+    #连接超时时间
+    timeout: 50000000
+mybatis:
+  mapper-locations: classpath*:com/papla/cloud/**/*Mapper.xml
+  type-aliases-package: com.papla.cloud.**.domain
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+pagehelper:
+  helperDialect: mysql                           #分页插件方言选择
+  reasonable: true                                #合理化参数，设为true时pageNum<=0 时会查第一页， pageNum>pages（超过总数时），会查询最后一页
+  supportMethodsArguments: true
+
+papla:
+  cloud:
+    sawgger:
+      title: 工作流引擎
+      description: 工作流引擎
+      base-package: com.papla.cloud.workflow

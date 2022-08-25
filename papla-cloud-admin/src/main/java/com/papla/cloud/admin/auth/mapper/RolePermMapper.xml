@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.auth.mapper.RolePermMapper">
+
+	<sql id="columns">
+		T.ID id ,
+		T.ROLE_ID roleId ,
+		T.PERM_ID permId ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_auth_role_perm T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.auth.domain.RolePerm" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_auth_role_perm T where 1=1
+		<if test="roleId != null and roleId != ''"> and T.ROLE_ID = #{roleId,jdbcType=VARCHAR}</if>
+		<if test="permId != null and permId != ''"> and T.PERM_ID = #{permId,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.auth.domain.RolePerm" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_role_perm T
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.auth.domain.RolePerm" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_role_perm T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.admin.auth.domain.RolePerm">
+		insert into papla_auth_role_perm
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="id != null">ID,</if>
+	 		<if test="roleId != null">ROLE_ID,</if>
+	 		<if test="permId != null">PERM_ID,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id,jdbcType=VARCHAR},</if>
+			<if test="roleId != null">#{roleId,jdbcType=VARCHAR},</if>
+			<if test="permId != null">#{permId,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.admin.auth.domain.RolePerm">
+		update papla_auth_role_perm T
+		<set>
+			<if test="roleId != null">ROLE_ID = #{roleId,jdbcType=VARCHAR},</if>
+			<if test="permId != null">PERM_ID = #{permId,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_auth_role_perm where ROLE_ID = #{roleId,jdbcType=VARCHAR}
+        <if test="notMenu">
+            and not exists(
+                select 1 from papla_auth_perm rp,papla_auth_role_menu rm where rp.id = perm_id and rp.menu_id = rm.menu_id and rm.role_id = role_id
+            )
+        </if>
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_auth_role_perm where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.auth.domain.RolePerm">
+		delete from papla_auth_role_perm 
+		where  ID = #{id,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

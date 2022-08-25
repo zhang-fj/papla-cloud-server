@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.WorkFlowUserMapper">
+
+    <!--根据用户Id , 查找员工姓名  -->
+    <select id="getEmpNameByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select distinct empName from papla_wf_user_info where a.user_id = #{userId}
+    </select>
+
+</mapper>

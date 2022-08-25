@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.hr.mapper.OrgMapper">
+
+    <sql id="columns">
+		T.ORG_ID orgId ,
+		T.ORG_CODE orgCode ,
+		T.ORG_NAME orgName ,
+		T.ORG_SHORT_NAME orgShortName ,
+		T.UP_ORG_ID upOrgId ,
+		T.ORG_TYPE orgType ,
+		T.ENABLED enabled ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+    <!-- 根据查询信息获取信息总数量 -->
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_hr_orgs T where 1=1
+	</select>
+
+    <!-- 根据参数查询所有数据 -->
+    <select id="findAll" resultType="com.papla.cloud.admin.hr.domain.Org" parameterType="java.util.Map">
+        select
+        <include refid="columns"/>,
+        ( select count(o.org_id) from papla_hr_orgs o where o.up_org_id = T.org_id ) subOrgCount,
+        ( select count(d.dept_id) from papla_hr_depts d  where d.org_id = T.org_id ) subDeptCount,
+        ( select count(p.post_id) from papla_hr_posts p where p.dept_id = T.org_id ) subPostCount
+        from papla_hr_orgs T where 1=1
+        <if test="orgCode != null and orgCode != ''"> and T.ORG_CODE like concat('%',#{orgCode,jdbcType=VARCHAR},'%')</if>
+        <if test="orgName != null and orgName != ''"> and T.ORG_NAME like concat('%',#{orgName,jdbcType=VARCHAR},'%')</if>
+        <if test="orgShortName != null and orgShortName != ''"> and T.ORG_SHORT_NAME like concat('%',#{orgShortName,jdbcType=VARCHAR},'%')</if>
+        <if test="upOrgId != null and upOrgId != ''"> and T.UP_ORG_ID = #{upOrgId,jdbcType=VARCHAR}</if>
+        <if test="orgType != null and orgType != ''"> and T.ORG_TYPE = #{orgType,jdbcType=VARCHAR}</if>
+        <if test="enabled != null and enabled != ''"> and T.ENABLED = #{enabled,jdbcType=VARCHAR}</if>
+    </select>
+
+    <!-- 根据id获取一条数据-->
+    <select id="selectByPK" resultType="com.papla.cloud.admin.hr.domain.Org" parameterType="java.util.Map">
+        select
+        <include refid="columns"/>
+        from papla_hr_orgs T
+        where  T.ORG_ID = #{orgId,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据参数获取一条数据 -->
+    <select id="selectByPropertys" resultType="com.papla.cloud.admin.hr.domain.Org" parameterType="java.util.Map">
+        select
+        <include refid="columns"/>
+        from papla_hr_orgs T
+        where 1=1
+    </select>
+
+    <!-- 添加一条数据 -->
+    <insert id="insert" parameterType="com.papla.cloud.admin.hr.domain.Org">
+        insert into papla_hr_orgs
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">ORG_ID,</if>
+            <if test="orgCode != null">ORG_CODE,</if>
+            <if test="orgName != null">ORG_NAME,</if>
+            <if test="orgShortName != null">ORG_SHORT_NAME,</if>
+            <if test="upOrgId != null">UP_ORG_ID,</if>
+            <if test="orgType != null">ORG_TYPE,</if>
+            <if test="enabled != null">ENABLED,</if>
+            <if test="createDt != null">CREATE_DT,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="updateDt != null">UPDATE_DT,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">#{orgId,jdbcType=VARCHAR},</if>
+            <if test="orgCode != null">#{orgCode,jdbcType=VARCHAR},</if>
+            <if test="orgName != null">#{orgName,jdbcType=VARCHAR},</if>
+            <if test="orgShortName != null">#{orgShortName,jdbcType=VARCHAR},</if>
+            <if test="upOrgId != null">#{upOrgId,jdbcType=VARCHAR},</if>
+            <if test="orgType != null">#{orgType,jdbcType=VARCHAR},</if>
+            <if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+            <if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+            <if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改一条数据 -->
+    <update id="update" parameterType="com.papla.cloud.admin.hr.domain.Org">
+        update papla_hr_orgs T
+        <set>
+            <if test="orgId != null">ORG_ID = #{orgId,jdbcType=VARCHAR},</if>
+            <if test="orgCode != null">ORG_CODE = #{orgCode,jdbcType=VARCHAR},</if>
+            <if test="orgName != null">ORG_NAME = #{orgName,jdbcType=VARCHAR},</if>
+            <if test="orgShortName != null">ORG_SHORT_NAME = #{orgShortName,jdbcType=VARCHAR},</if>
+            <if test="upOrgId != null">UP_ORG_ID = #{upOrgId,jdbcType=VARCHAR},</if>
+            <if test="orgType != null">ORG_TYPE = #{orgType,jdbcType=VARCHAR},</if>
+            <if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+        </set>
+        where  T.ORG_ID = #{orgId,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据参数删除 -->
+    <delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_hr_orgs where 1=1
+	</delete>
+
+    <!-- 根据ids数组删除 -->
+    <delete id="deleteByIds" parameterType="java.util.Map">
+        delete from papla_hr_orgs where 1=1
+        <foreach collection="list" item="id" index="index" open=" and ORG_ID in(" close=")" separator=",">
+            #{id,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <!-- 根据实体删除一条数据 -->
+    <delete id="delete" parameterType="com.papla.cloud.admin.hr.domain.Org">
+		delete from papla_hr_orgs 
+		where  ORG_ID = #{orgId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

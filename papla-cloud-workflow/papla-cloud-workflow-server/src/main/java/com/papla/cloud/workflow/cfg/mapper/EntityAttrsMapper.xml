@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.workflow.cfg.mapper.EntityAttrsMapper">
+
+	<sql id="columns">
+		T.ATTR_ID attrId ,
+		T.ENTITY_ID entityId ,
+		T.ATTR_CODE attrCode ,
+		T.ATTR_NAME attrName ,
+		T.ATTR_CATEGORY attrCategory ,
+		T.FUNC_TYPE funcType ,
+		T.FUNC_VALUE funcValue ,
+		T.ATTR_DESC attrDesc ,
+		T.ATTR_DATA_TYPE attrDataType ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_wf_entity_attrs T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.workflow.cfg.domain.EntityAttrs" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_wf_entity_attrs T where 1=1
+		<if test="attrId != null and attrId != ''"> and T.ATTR_ID = #{attrId,jdbcType=VARCHAR}</if>
+		<if test="entityId != null and entityId != ''"> and T.ENTITY_ID = #{entityId,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.workflow.cfg.domain.EntityAttrs" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_entity_attrs T
+		where  T.ATTR_ID = #{attrId,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.workflow.cfg.domain.EntityAttrs" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_entity_attrs T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.workflow.cfg.domain.EntityAttrs">
+		insert into papla_wf_entity_attrs
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="attrId != null">ATTR_ID,</if>
+	 		<if test="entityId != null">ENTITY_ID,</if>
+	 		<if test="attrCode != null">ATTR_CODE,</if>
+	 		<if test="attrName != null">ATTR_NAME,</if>
+	 		<if test="attrCategory != null">ATTR_CATEGORY,</if>
+	 		<if test="funcType != null">FUNC_TYPE,</if>
+	 		<if test="funcValue != null">FUNC_VALUE,</if>
+	 		<if test="attrDesc != null">ATTR_DESC,</if>
+	 		<if test="attrDataType != null">ATTR_DATA_TYPE,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="attrId != null">#{attrId,jdbcType=VARCHAR},</if>
+			<if test="entityId != null">#{entityId,jdbcType=VARCHAR},</if>
+			<if test="attrCode != null">#{attrCode,jdbcType=VARCHAR},</if>
+			<if test="attrName != null">#{attrName,jdbcType=VARCHAR},</if>
+			<if test="attrCategory != null">#{attrCategory,jdbcType=VARCHAR},</if>
+			<if test="funcType != null">#{funcType,jdbcType=VARCHAR},</if>
+			<if test="funcValue != null">#{funcValue,jdbcType=VARCHAR},</if>
+			<if test="attrDesc != null">#{attrDesc,jdbcType=VARCHAR},</if>
+			<if test="attrDataType != null">#{attrDataType,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.workflow.cfg.domain.EntityAttrs">
+		update papla_wf_entity_attrs T
+		<set>
+			<if test="attrId != null">ATTR_ID = #{attrId,jdbcType=VARCHAR},</if>
+			<if test="entityId != null">ENTITY_ID = #{entityId,jdbcType=VARCHAR},</if>
+			<if test="attrCode != null">ATTR_CODE = #{attrCode,jdbcType=VARCHAR},</if>
+			<if test="attrName != null">ATTR_NAME = #{attrName,jdbcType=VARCHAR},</if>
+			<if test="attrCategory != null">ATTR_CATEGORY = #{attrCategory,jdbcType=VARCHAR},</if>
+			<if test="funcType != null">FUNC_TYPE = #{funcType,jdbcType=VARCHAR},</if>
+			<if test="funcValue != null">FUNC_VALUE = #{funcValue,jdbcType=VARCHAR},</if>
+			<if test="attrDesc != null">ATTR_DESC = #{attrDesc,jdbcType=VARCHAR},</if>
+			<if test="attrDataType != null">ATTR_DATA_TYPE = #{attrDataType,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ATTR_ID = #{attrId,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_wf_entity_attrs where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_wf_entity_attrs where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ATTR_ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.workflow.cfg.domain.EntityAttrs">
+		delete from papla_wf_entity_attrs 
+		where  ATTR_ID = #{attrId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

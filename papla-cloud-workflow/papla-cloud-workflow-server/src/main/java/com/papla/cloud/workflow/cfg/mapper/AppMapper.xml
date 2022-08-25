@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.workflow.cfg.mapper.AppMapper">
+
+	<sql id="columns">
+		T.APP_ID appId ,
+		T.APP_CODE appCode ,
+		T.APP_NAME appName ,
+		T.APP_TYPE appType ,
+		T.APP_DESC appDesc ,
+		T.APP_LANG appLang ,
+		T.APP_LOGIN_URL appLoginUrl ,
+		T.CLIENT_ID clientId ,
+		T.CLIENT_SECRET clientSecret ,
+		T.WEB_HOST webHost ,
+		T.WEB_PORT webPort ,
+		T.WEB_PROJECT webProject ,
+		T.DB_TYPE dbType ,
+		T.DB_URL dbUrl ,
+		T.DB_USER dbUser ,
+		T.DB_PASSWORD dbPassword ,
+		T.ENABLED enabled ,
+		T.VERSION version ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_wf_apps T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.workflow.cfg.domain.App" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_wf_apps T where 1=1
+		<if test="appCode != null and appCode != ''"> and T.APP_CODE like concat('%',#{appCode,jdbcType=VARCHAR},'%')</if>
+		<if test="appName != null and appName != ''"> and T.APP_NAME like concat('%',#{appName,jdbcType=VARCHAR},'%')</if>
+		<if test="appType != null and appType != ''"> and T.APP_TYPE = #{appType,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.workflow.cfg.domain.App" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_apps T
+		where  T.APP_ID = #{appId,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.workflow.cfg.domain.App" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_apps T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.workflow.cfg.domain.App">
+		insert into papla_wf_apps
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="appId != null">APP_ID,</if>
+	 		<if test="appCode != null">APP_CODE,</if>
+	 		<if test="appName != null">APP_NAME,</if>
+	 		<if test="appType != null">APP_TYPE,</if>
+	 		<if test="appDesc != null">APP_DESC,</if>
+	 		<if test="appLang != null">APP_LANG,</if>
+	 		<if test="appLoginUrl != null">APP_LOGIN_URL,</if>
+	 		<if test="clientId != null">CLIENT_ID,</if>
+	 		<if test="clientSecret != null">CLIENT_SECRET,</if>
+	 		<if test="webHost != null">WEB_HOST,</if>
+	 		<if test="webPort != null">WEB_PORT,</if>
+	 		<if test="webProject != null">WEB_PROJECT,</if>
+	 		<if test="dbType != null">DB_TYPE,</if>
+	 		<if test="dbUrl != null">DB_URL,</if>
+	 		<if test="dbUser != null">DB_USER,</if>
+	 		<if test="dbPassword != null">DB_PASSWORD,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="version != null">VERSION,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="appId != null">#{appId,jdbcType=VARCHAR},</if>
+			<if test="appCode != null">#{appCode,jdbcType=VARCHAR},</if>
+			<if test="appName != null">#{appName,jdbcType=VARCHAR},</if>
+			<if test="appType != null">#{appType,jdbcType=VARCHAR},</if>
+			<if test="appDesc != null">#{appDesc,jdbcType=VARCHAR},</if>
+			<if test="appLang != null">#{appLang,jdbcType=VARCHAR},</if>
+			<if test="appLoginUrl != null">#{appLoginUrl,jdbcType=VARCHAR},</if>
+			<if test="clientId != null">#{clientId,jdbcType=VARCHAR},</if>
+			<if test="clientSecret != null">#{clientSecret,jdbcType=VARCHAR},</if>
+			<if test="webHost != null">#{webHost,jdbcType=VARCHAR},</if>
+			<if test="webPort != null">#{webPort,jdbcType=VARCHAR},</if>
+			<if test="webProject != null">#{webProject,jdbcType=VARCHAR},</if>
+			<if test="dbType != null">#{dbType,jdbcType=VARCHAR},</if>
+			<if test="dbUrl != null">#{dbUrl,jdbcType=VARCHAR},</if>
+			<if test="dbUser != null">#{dbUser,jdbcType=VARCHAR},</if>
+			<if test="dbPassword != null">#{dbPassword,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="version != null">#{version,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.workflow.cfg.domain.App">
+		update papla_wf_apps T
+		<set>
+			<if test="appId != null">APP_ID = #{appId,jdbcType=VARCHAR},</if>
+			<if test="appCode != null">APP_CODE = #{appCode,jdbcType=VARCHAR},</if>
+			<if test="appName != null">APP_NAME = #{appName,jdbcType=VARCHAR},</if>
+			<if test="appType != null">APP_TYPE = #{appType,jdbcType=VARCHAR},</if>
+			<if test="appDesc != null">APP_DESC = #{appDesc,jdbcType=VARCHAR},</if>
+			<if test="appLang != null">APP_LANG = #{appLang,jdbcType=VARCHAR},</if>
+			<if test="appLoginUrl != null">APP_LOGIN_URL = #{appLoginUrl,jdbcType=VARCHAR},</if>
+			<if test="clientId != null">CLIENT_ID = #{clientId,jdbcType=VARCHAR},</if>
+			<if test="clientSecret != null">CLIENT_SECRET = #{clientSecret,jdbcType=VARCHAR},</if>
+			<if test="webHost != null">WEB_HOST = #{webHost,jdbcType=VARCHAR},</if>
+			<if test="webPort != null">WEB_PORT = #{webPort,jdbcType=VARCHAR},</if>
+			<if test="webProject != null">WEB_PROJECT = #{webProject,jdbcType=VARCHAR},</if>
+			<if test="dbType != null">DB_TYPE = #{dbType,jdbcType=VARCHAR},</if>
+			<if test="dbUrl != null">DB_URL = #{dbUrl,jdbcType=VARCHAR},</if>
+			<if test="dbUser != null">DB_USER = #{dbUser,jdbcType=VARCHAR},</if>
+			<if test="dbPassword != null">DB_PASSWORD = #{dbPassword,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="version != null">VERSION = #{version,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.APP_ID = #{appId,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_wf_apps where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_wf_apps where 1=1
+		<foreach collection="list" item="id" index="index" open=" and APP_ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.workflow.cfg.domain.App">
+		delete from papla_wf_apps 
+		where  APP_ID = #{appId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

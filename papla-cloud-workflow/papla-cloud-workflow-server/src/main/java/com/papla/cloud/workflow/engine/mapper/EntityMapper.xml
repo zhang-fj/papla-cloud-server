@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.EntityMapper">
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.EntityBean" id="entityBeanMap">
+        <result property="appId" column="app_id"/>
+        <result property="entityId" column="entity_id"/>
+        <result property="entityCode" column="entity_code"/>
+        <result property="entityName" column="entity_name"/>
+        <result property="entityDesc" column="entity_desc"/>
+        <result property="authUserCls" column="auth_user_cls"/>
+        <result property="busTableName" column="bus_table_name"/>
+        <result property="busTablePk" column="bus_table_pk"/>
+        <result property="funcType" column="func_type"/>
+        <result property="funcValue" column="func_value"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createDt" column="create_dt" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateDt" column="update_dt" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <!-- 根据【流程实例ID】取得【业务实体信息】  -->
+    <select id="getEntityByInstanceId" parameterType="java.lang.String" resultMap="entityBeanMap">
+        select a.app_id,
+        a.entity_id,
+        a.entity_code,
+        a.entity_name,
+        a.entity_desc,
+        a.func_type,
+        a.func_value,
+        a.bus_table_name,
+        a.bus_table_pk,
+        a.enabled,
+        a.create_by,
+        a.create_dt,
+        a.update_by,
+        a.update_dt,
+        a.auth_user_cls
+        from papla_wf_run_instance t, papla_wf_entities a
+        where t.entity_id = a.entity_id
+        and t.instance_id = #{instanceId}
+    </select>
+
+</mapper>

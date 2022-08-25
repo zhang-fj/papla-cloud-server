@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.hr.mapper.DeptMapper">
+
+	<sql id="columns">
+		T.DEPT_ID deptId ,
+		T.DEPT_CODE deptCode ,
+		T.DEPT_NAME deptName ,
+		T.DEPT_SHORT_NAME deptShortName ,
+		T.UP_DP_ID upDpId ,
+		T.ORG_ID orgId ,
+		T.ENABLED enabled ,
+		T.SORT sort ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_hr_depts T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.hr.domain.Dept" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/>,
+			(select count(d.dept_id) from papla_hr_depts d where d.up_dp_id = T.dept_id ) subDeptCount,
+            ( select count(p.post_id) from papla_hr_posts p where p.dept_id = T.dept_id ) subPostCount
+		from papla_hr_depts T where 1=1
+		<if test="deptCode != null and deptCode != ''"> and T.DEPT_CODE like concat('%',#{deptCode,jdbcType=VARCHAR},'%')</if>
+		<if test="deptName != null and deptName != ''"> and T.DEPT_NAME like concat('%',#{deptName,jdbcType=VARCHAR},'%')</if>
+		<if test="deptShortName != null and deptShortName != ''"> and T.DEPT_SHORT_NAME like concat('%',#{deptShortName,jdbcType=VARCHAR},'%')</if>
+		<if test="upDpId != null and upDpId != ''"> and T.UP_DP_ID = #{upDpId,jdbcType=VARCHAR}</if>
+		<if test="orgId != null and orgId != ''"> and T.ORG_ID = #{orgId,jdbcType=VARCHAR}</if>
+		<if test="enabled != null and enabled != ''"> and T.ENABLED = #{enabled,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.hr.domain.Dept" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_hr_depts T
+		where  T.DEPT_ID = #{deptId,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.hr.domain.Dept" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_hr_depts T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.admin.hr.domain.Dept">
+		insert into papla_hr_depts
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="deptId != null">DEPT_ID,</if>
+	 		<if test="deptCode != null">DEPT_CODE,</if>
+	 		<if test="deptName != null">DEPT_NAME,</if>
+	 		<if test="deptShortName != null">DEPT_SHORT_NAME,</if>
+	 		<if test="upDpId != null">UP_DP_ID,</if>
+	 		<if test="orgId != null">ORG_ID,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="sort != null">SORT,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="deptId != null">#{deptId,jdbcType=VARCHAR},</if>
+			<if test="deptCode != null">#{deptCode,jdbcType=VARCHAR},</if>
+			<if test="deptName != null">#{deptName,jdbcType=VARCHAR},</if>
+			<if test="deptShortName != null">#{deptShortName,jdbcType=VARCHAR},</if>
+			<if test="upDpId != null">#{upDpId,jdbcType=VARCHAR},</if>
+			<if test="orgId != null">#{orgId,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="sort != null">#{sort,jdbcType=NUMERIC},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.admin.hr.domain.Dept">
+		update papla_hr_depts T
+		<set>
+			<if test="deptId != null">DEPT_ID = #{deptId,jdbcType=VARCHAR},</if>
+			<if test="deptCode != null">DEPT_CODE = #{deptCode,jdbcType=VARCHAR},</if>
+			<if test="deptName != null">DEPT_NAME = #{deptName,jdbcType=VARCHAR},</if>
+			<if test="deptShortName != null">DEPT_SHORT_NAME = #{deptShortName,jdbcType=VARCHAR},</if>
+			<if test="upDpId != null">UP_DP_ID = #{upDpId,jdbcType=VARCHAR},</if>
+			<if test="orgId != null">ORG_ID = #{orgId,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="sort != null">SORT = #{sort,jdbcType=NUMERIC},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.DEPT_ID = #{deptId,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_hr_depts where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_hr_depts where 1=1
+		<foreach collection="list" item="id" index="index" open=" and DEPT_ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.hr.domain.Dept">
+		delete from papla_hr_depts 
+		where  DEPT_ID = #{deptId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

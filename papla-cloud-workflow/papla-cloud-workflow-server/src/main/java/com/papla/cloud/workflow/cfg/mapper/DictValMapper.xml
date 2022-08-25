@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.workflow.cfg.mapper.DictValMapper">
+
+	<sql id="columns">
+		T.ID id ,
+		T.DICT_ID dictId ,
+		T.DICT_CODE dictCode ,
+		T.DICT_LABEL dictLabel ,
+		T.DICT_VALUE dictValue ,
+		T.SORT sort ,
+		T.DESCRIPTION description ,
+		T.ENABLED enabled ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_wf_dict_val T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.workflow.cfg.domain.DictVal" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_wf_dict_val T where 1=1
+		<if test="dictId != null and dictId != ''"> and T.DICT_ID = #{dictId,jdbcType=VARCHAR}</if>
+        <if test="dictCode != null and dictCode != ''"> and T.DICT_CODE = #{dictCode,jdbcType=VARCHAR}</if>
+        order by T.SORT
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.workflow.cfg.domain.DictVal" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_dict_val T
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.workflow.cfg.domain.DictVal" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_wf_dict_val T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.workflow.cfg.domain.DictVal">
+		insert into papla_wf_dict_val
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="id != null">ID,</if>
+	 		<if test="dictId != null">DICT_ID,</if>
+	 		<if test="dictCode != null">DICT_CODE,</if>
+	 		<if test="dictLabel != null">DICT_LABEL,</if>
+	 		<if test="dictValue != null">DICT_VALUE,</if>
+	 		<if test="sort != null">SORT,</if>
+	 		<if test="description != null">DESCRIPTION,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id,jdbcType=VARCHAR},</if>
+			<if test="dictId != null">#{dictId,jdbcType=VARCHAR},</if>
+			<if test="dictCode != null">#{dictCode,jdbcType=VARCHAR},</if>
+			<if test="dictLabel != null">#{dictLabel,jdbcType=VARCHAR},</if>
+			<if test="dictValue != null">#{dictValue,jdbcType=VARCHAR},</if>
+			<if test="sort != null">#{sort,jdbcType=INTEGER},</if>
+			<if test="description != null">#{description,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.workflow.cfg.domain.DictVal">
+		update papla_wf_dict_val T
+		<set>
+			<if test="dictId != null">DICT_ID = #{dictId,jdbcType=VARCHAR},</if>
+			<if test="dictCode != null">DICT_CODE = #{dictCode,jdbcType=VARCHAR},</if>
+			<if test="dictLabel != null">DICT_LABEL = #{dictLabel,jdbcType=VARCHAR},</if>
+			<if test="dictValue != null">DICT_VALUE = #{dictValue,jdbcType=VARCHAR},</if>
+			<if test="sort != null">SORT = #{sort,jdbcType=INTEGER},</if>
+			<if test="description != null">DESCRIPTION = #{description,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_wf_dict_val where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_wf_dict_val where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.workflow.cfg.domain.DictVal">
+		delete from papla_wf_dict_val 
+		where  ID = #{id,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.hr.mapper.EmpMapper">
+
+	<sql id="columns">
+		T.EMP_ID empId ,
+		T.EMP_CODE empCode ,
+		T.EMP_NAME empName ,
+		T.EMP_TYPE empType ,
+		T.EMP_STATUS empStatus ,
+		T.ENTRY_TIME entryTime ,
+		T.DEPAR_TIME deparTIme ,
+		T.EMP_SEX empSex ,
+		T.ID_NO idNo ,
+		T.PHONE_NO phoneNo ,
+		T.FIXED_PHONE_NO fixedPhoneNo ,
+		T.ADDRESS address ,
+		T.EMAIL email ,
+		T.ENABLED enabled ,
+		T.BIRTHDAY birthday ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_hr_emps T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.hr.domain.Emp" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_hr_emps T where 1=1
+		<if test="empCode != null and empCode != ''"> and T.EMP_CODE like concat('%',#{empCode,jdbcType=VARCHAR},'%')</if>
+		<if test="empName != null and empName != ''"> and T.EMP_NAME like concat('%',#{empName,jdbcType=VARCHAR},'%')</if>
+		<if test="empSex != null and empSex != ''"> and T.EMP_SEX = #{empSex,jdbcType=VARCHAR}</if>
+        <if test="empType != null and empType != ''"> and T.EMP_TYPE = #{empType,jdbcType=VARCHAR}</if>
+        <if test="empStatus != null and empStatus != ''"> and T.EMP_STATUS = #{empStatus,jdbcType=VARCHAR}</if>
+		<if test="phoneNo != null and phoneNo != ''"> and T.PHONE_NO like concat('%',#{phoneNo,jdbcType=VARCHAR},'%')</if>
+		<if test="enabled != null and enabled != ''"> and T.ENABLED = #{enabled,jdbcType=VARCHAR}</if>
+        <if test="postId != null and postId != ''">
+            and exists(
+                select 1 from papla_hr_emps_asg ea where ea.POST_ID = #{postId,jdbcType=VARCHAR} and ea.emp_id = T.EMP_ID
+            )
+        </if>
+        <if test="notPostId != null and notPostId != ''">
+            and not exists(
+                select 1 from papla_hr_emps_asg ea where ea.POST_ID = #{notPostId,jdbcType=VARCHAR} and ea.emp_id = T.EMP_ID
+            )
+        </if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.hr.domain.Emp" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_hr_emps T
+		where  T.EMP_ID = #{empId,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.hr.domain.Emp" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_hr_emps T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.admin.hr.domain.Emp">
+		insert into papla_hr_emps
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="empId != null">EMP_ID,</if>
+	 		<if test="empCode != null">EMP_CODE,</if>
+	 		<if test="empName != null">EMP_NAME,</if>
+	 		<if test="empType != null">EMP_TYPE,</if>
+	 		<if test="empStatus != null">EMP_STATUS,</if>
+	 		<if test="entryTime != null">ENTRY_TIME,</if>
+	 		<if test="deparTime != null">DEPAR_TIME,</if>
+	 		<if test="empSex != null">EMP_SEX,</if>
+	 		<if test="idNo != null">ID_NO,</if>
+	 		<if test="phoneNo != null">PHONE_NO,</if>
+            <if test="fixedPhoneNo != null">FIXED_PHONE_NO,</if>
+	 		<if test="address != null">ADDRESS,</if>
+	 		<if test="email != null">EMAIL,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="birthday != null">BIRTHDAY,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="empId != null">#{empId,jdbcType=VARCHAR},</if>
+			<if test="empCode != null">#{empCode,jdbcType=VARCHAR},</if>
+			<if test="empName != null">#{empName,jdbcType=VARCHAR},</if>
+            <if test="empType != null">#{empType,jdbcType=VARCHAR},</if>
+            <if test="empStatus != null">#{empStatus,jdbcType=VARCHAR},</if>
+            <if test="entryTime != null">#{entryTime,jdbcType=VARCHAR},</if>
+            <if test="deparTime != null">#{deparTime,jdbcType=VARCHAR},</if>
+			<if test="empSex != null">#{empSex,jdbcType=VARCHAR},</if>
+			<if test="idNo != null">#{idNo,jdbcType=VARCHAR},</if>
+			<if test="phoneNo != null">#{phoneNo,jdbcType=VARCHAR},</if>
+            <if test="fixedPhoneNo != null">#{fixedPhoneNo,jdbcType=VARCHAR},</if>
+			<if test="address != null">#{address,jdbcType=VARCHAR},</if>
+			<if test="email != null">#{email,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="birthday != null">#{birthday,jdbcType=TIMESTAMP},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.admin.hr.domain.Emp">
+		update papla_hr_emps T
+		<set>
+			<if test="empId != null">EMP_ID = #{empId,jdbcType=VARCHAR},</if>
+			<if test="empCode != null">EMP_CODE = #{empCode,jdbcType=VARCHAR},</if>
+			<if test="empName != null">EMP_NAME = #{empName,jdbcType=VARCHAR},</if>
+			<if test="empType != null">EMP_TYPE = #{empType,jdbcType=VARCHAR},</if>
+			<if test="empStatus != null">EMP_STATUS = #{empStatus,jdbcType=VARCHAR},</if>
+			<if test="entryTime != null">ENTRY_TIME = #{entryTime,jdbcType=VARCHAR},</if>
+			<if test="deparTime != null">DEPAR_TIME = #{deparTime,jdbcType=VARCHAR},</if>
+			<if test="empSex != null">EMP_SEX = #{empSex,jdbcType=VARCHAR},</if>
+			<if test="idNo != null">ID_NO = #{idNo,jdbcType=VARCHAR},</if>
+			<if test="phoneNo != null">PHONE_NO = #{phoneNo,jdbcType=VARCHAR},</if>
+			<if test="fixedPhoneNo != null">FIXED_PHONE_NO = #{fixedPhoneNo,jdbcType=VARCHAR},</if>
+			<if test="address != null">ADDRESS = #{address,jdbcType=VARCHAR},</if>
+			<if test="email != null">EMAIL = #{email,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="birthday != null">BIRTHDAY = #{birthday,jdbcType=TIMESTAMP},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.EMP_ID = #{empId,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_hr_emps where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_hr_emps where 1=1
+		<foreach collection="list" item="id" index="index" open=" and EMP_ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.hr.domain.Emp">
+		delete from papla_hr_emps 
+		where  EMP_ID = #{empId,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

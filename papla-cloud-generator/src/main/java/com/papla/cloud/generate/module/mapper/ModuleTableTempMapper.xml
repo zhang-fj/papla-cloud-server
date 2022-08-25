@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.generate.module.mapper.ModuleTableTempMapper">
+
+    <!-- 根据查询信息获取信息总数量 -->
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from papla_module_table_temp T where 1=1
+    </select>
+
+    <!-- 根据参数查询所有数据 -->
+    <select id="findAll" resultType="com.papla.cloud.generate.module.domain.ModuleTableTemp" parameterType="java.util.Map">
+        select
+        T.ID id ,
+        T.TABLE_ID tableId ,
+        T.TEMP_CFG_ID tempCfgId ,
+        T.TEMP_FILE_ID tempFileId ,
+        T.CREATE_DT createDt ,
+        T.CREATE_BY createBy ,
+        T.UPDATE_DT updateDt ,
+        T.UPDATE_BY updateBy ,
+        T.TEMP_CFG_NAME tempCfgName ,
+        T.TEMP_FILE_NAME tempFileName ,
+        T.TEMP_CATE tempCate ,
+        T.GEN_MENU genMenu ,
+        T.GAN_API ganApi ,
+        T.COVER cover
+        from papla_module_table_temp T where 1=1
+        <if test="tableId != null and tableId != ''">and T.TABLE_ID = #{tableId,jdbcType=VARCHAR} </if>
+        <if test="tempCfgId != null and tempCfgId != ''">and T.TEMP_CFG_ID = #{tempCfgId,jdbcType=VARCHAR} </if>
+    </select>
+
+    <!-- 根据id获取一条数据-->
+    <select id="selectByPK" resultType="com.papla.cloud.generate.module.domain.ModuleTableTemp" parameterType="java.util.Map">
+        select
+        T.ID id ,
+        T.TABLE_ID tableId ,
+        T.TEMP_CFG_ID tempCfgId ,
+        T.TEMP_FILE_ID tempFileId ,
+        T.CREATE_DT createDt ,
+        T.CREATE_BY createBy ,
+        T.UPDATE_DT updateDt ,
+        T.UPDATE_BY updateBy ,
+        T.TEMP_CFG_NAME tempCfgName ,
+        T.TEMP_FILE_NAME tempFileName ,
+        T.TEMP_CATE tempCate ,
+        T.GEN_MENU genMenu ,
+        T.GAN_API ganApi ,
+        T.COVER cover
+        from papla_module_table_temp T
+        where T.ID = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据参数获取一条数据 -->
+    <select id="selectByPropertys" resultType="com.papla.cloud.generate.module.domain.ModuleTableTemp"
+            parameterType="java.util.Map">
+        select
+        T.ID id ,
+        T.TABLE_ID tableId ,
+        T.TEMP_CFG_ID tempCfgId ,
+        T.TEMP_FILE_ID tempFileId ,
+        T.CREATE_DT createDt ,
+        T.CREATE_BY createBy ,
+        T.UPDATE_DT updateDt ,
+        T.UPDATE_BY updateBy ,
+        T.TEMP_CFG_NAME tempCfgName ,
+        T.TEMP_FILE_NAME tempFileName ,
+        T.TEMP_CATE tempCate ,
+        T.GEN_MENU genMenu ,
+        T.GAN_API ganApi ,
+        T.COVER cover
+        from papla_module_table_temp T
+        where 1=1
+    </select>
+
+    <!-- 添加一条数据 -->
+    <insert id="insert" parameterType="com.papla.cloud.generate.module.domain.ModuleTableTemp">
+        insert into papla_module_table_temp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">ID,</if>
+            <if test="tableId != null">TABLE_ID,</if>
+            <if test="tempCfgId != null">TEMP_CFG_ID,</if>
+            <if test="tempFileId != null">TEMP_FILE_ID,</if>
+            <if test="createDt != null">CREATE_DT,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="updateDt != null">UPDATE_DT,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="tempCfgName != null">TEMP_CFG_NAME,</if>
+            <if test="tempFileName != null">TEMP_FILE_NAME,</if>
+            <if test="tempCate != null">TEMP_CATE,</if>
+            <if test="genMenu != null">GEN_MENU,</if>
+            <if test="ganApi != null">GAN_API,</if>
+            <if test="cover != null">COVER,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=VARCHAR},</if>
+            <if test="tableId != null">#{tableId,jdbcType=VARCHAR},</if>
+            <if test="tempCfgId != null">#{tempCfgId,jdbcType=VARCHAR},</if>
+            <if test="tempFileId != null">#{tempFileId,jdbcType=VARCHAR},</if>
+            <if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+            <if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+            <if test="tempCfgName != null">#{tempCfgName,jdbcType=VARCHAR},</if>
+            <if test="tempFileName != null">#{tempFileName,jdbcType=VARCHAR},</if>
+            <if test="tempCate != null">#{tempCate,jdbcType=VARCHAR},</if>
+            <if test="genMenu != null">#{genMenu,jdbcType=VARCHAR},</if>
+            <if test="ganApi != null">#{ganApi,jdbcType=VARCHAR},</if>
+            <if test="cover != null">#{cover,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改一条数据 -->
+    <update id="update" parameterType="com.papla.cloud.generate.module.domain.ModuleTableTemp">
+        update papla_module_table_temp T
+        <set>
+            <if test="tableId != null">TABLE_ID = #{tableId,jdbcType=VARCHAR},</if>
+            <if test="tempCfgId != null">TEMP_CFG_ID = #{tempCfgId,jdbcType=VARCHAR},</if>
+            <if test="tempFileId != null">TEMP_FILE_ID = #{tempFileId,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+            <if test="tempCfgName != null">TEMP_CFG_NAME = #{tempCfgName,jdbcType=VARCHAR},</if>
+            <if test="tempFileName != null">TEMP_FILE_NAME = #{tempFileName,jdbcType=VARCHAR},</if>
+            <if test="tempCate != null">TEMP_CATE = #{tempCate,jdbcType=VARCHAR},</if>
+            <if test="genMenu != null">GEN_MENU = #{genMenu,jdbcType=VARCHAR},</if>
+            <if test="ganApi != null">GAN_API = #{ganApi,jdbcType=VARCHAR},</if>
+            <if test="cover != null">COVER = #{cover,jdbcType=VARCHAR},</if>
+        </set>
+        where T.ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据参数删除 -->
+    <delete id="deleteByParams" parameterType="java.util.Map">
+        delete from papla_module_table_temp where table_id = #{tableId,jdbcType=VARCHAR}
+    </delete>
+
+    <!-- 根据ids数组删除 -->
+    <delete id="deleteByIds" parameterType="java.util.Map">
+        delete from papla_module_table_temp
+        where 1=1
+        <foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+            #{id,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <!-- 根据实体删除一条数据 -->
+    <delete id="delete" parameterType="com.papla.cloud.generate.module.domain.ModuleTableTemp">
+        delete from papla_module_table_temp where ID = #{id,jdbcType=VARCHAR}
+    </delete>
+
+</mapper>

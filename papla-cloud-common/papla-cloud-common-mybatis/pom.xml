@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+		<groupId>com.papla.cloud</groupId>
+		<artifactId>papla-cloud-common</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>papla-cloud-common-mybatis</artifactId>
+	<name>papla-cloud-common-mybatis</name>
+
+	<properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <log4jdbc.version>1.16</log4jdbc.version>
+        <oracle.version>11.2.0.3</oracle.version>
+        <druid.version>1.2.6</druid.version>
+	</properties>
+	<dependencies>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-security</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-swagger</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--监控sql日志-->
+        <dependency>
+            <groupId>org.bgee.log4jdbc-log4j2</groupId>
+            <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+            <version>${log4jdbc.version}</version>
+        </dependency>
+
+        <!-- druid数据源驱动 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+        <!--Mysql依赖包 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- oracle驱动 -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>${oracle.version}</version>
+        </dependency>
+
+        <!-- mybaits -->
+	    <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <!-- mybaits 分页插件 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+		
+	</dependencies>
+</project>

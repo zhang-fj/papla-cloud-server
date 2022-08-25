@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployConditionGroupMapper">
+
+    <!-- 批量保存【流程】或【节点】条件组 -->
+    <insert id="saveConditionGroup" parameterType="java.util.List">
+        insert into papla_wf_deploy_cond_group (
+        group_id, parent_type, parent_id, property_code, condition_value, create_by, create_dt
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.groupId,jdbcType=VARCHAR},
+            #{item.parentType,jdbcType=VARCHAR},
+            #{item.parentId,jdbcType=VARCHAR},
+            #{item.propertyCode,jdbcType=VARCHAR},
+            #{item.conditionValue,jdbcType=VARCHAR},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=DATE}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 查询【流程】或【节点】条件组 -->
+    <select id="getConditionGroupList" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ConditionGroupBean">
+        select gr.group_id groupId,
+        gr.parent_type parentType,
+        gr.parent_id parentId,
+        gr.property_code propertyCode,
+        gr.condition_value conditionValue,
+        gr.create_by createBy,
+        gr.update_by updateBy,
+        gr.create_dt createDate,
+        gr.update_dt updateDt
+        from papla_wf_deploy_cond_group gr
+        where gr.parent_id = #{parentId}
+        and gr.parent_type = #{parentType}
+        and gr.property_code = #{propertyCode}
+    </select>
+
+</mapper>

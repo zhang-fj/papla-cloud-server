@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployActivityPropertyMapper">
+
+    <!-- 批量保存【流程节点属性】信息 -->
+    <insert id="saveActivityProperty" parameterType="java.util.List">
+        insert into papla_wf_deploy_act_attrs (
+        act_id,deploy_id,property_code, property_name, property_value, create_by, create_dt
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.parentId,jdbcType=VARCHAR},
+            #{item.deployId,jdbcType=VARCHAR},
+            #{item.propertyCode,jdbcType=VARCHAR},
+            #{item.propertyName,jdbcType=VARCHAR},
+            #{item.propertyValue,jdbcType=VARCHAR},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=TIMESTAMP}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 查询某个【部署节点】的属性值  -->
+    <select id="getInstanceSingleActivityProperty" parameterType="java.util.Map" resultType="java.lang.String">
+        select aa.property_value from papla_wf_deploy_act_attrs aa,papla_wf_run_instance ri
+        where aa.deploy_id=ri.deploy_id
+        and ri.INSTANCE_ID = #{instanceId}
+        and aa.ACT_ID = #{actId}
+        and aa.PROPERTY_CODE = #{propCode}
+    </select>
+
+    <!-- 查询某个【部署节点】的属性值信息 -->
+    <select id="getInstanceSingleActivityPropertyBean" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityPropertyBean">
+        select
+        ri.instance_id instanceId,
+        aa.act_id actId,
+        aa.property_code propertyCode,
+        aa.property_name propertyName,
+        aa.property_value propertyValue
+        from papla_wf_deploy_acts pa,papla_wf_deploy_act_attrs aa,papla_wf_run_instance ri
+        where pa.act_id=aa.act_id and pa.deploy_id=ri.deploy_id
+        and ri.instance_id = #{instanceId}
+        and pa.act_id = #{actId}
+        and aa.property_code = #{propertyCode}
+    </select>
+
+    <!-- 查找【部署节点】全部属性列表 -->
+    <select id="getActivityPropertyList" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityPropertyBean">
+        select
+        aa.act_id actId,
+        aa.property_code propertyCode,
+        aa.property_name propertyName,
+        aa.property_value propertyValue
+        from papla_wf_deploy_act_attrs aa
+        where aa.deploy_id = #{deployId}
+        and aa.act_id = #{actId}
+    </select>
+
+</mapper>

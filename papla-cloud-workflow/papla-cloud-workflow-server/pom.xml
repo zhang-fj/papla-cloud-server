@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>papla-cloud-workflow</artifactId>
+        <groupId>com.papla.cloud</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>papla-cloud-workflow-server</artifactId>
+    
+    <properties>
+    	<fastjson.version>1.2.70</fastjson.version>
+    	<cxf.version>2.7.16</cxf.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-mybatis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-logging-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk13</classifier>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-bundle-minimal</artifactId>
+            <version>${cxf.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-asm</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wss4j</artifactId>
+                    <groupId>org.apache.ws.security</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xmltooling</artifactId>
+                    <groupId>org.opensaml</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>openws</artifactId>
+                    <groupId>org.opensaml</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>opensaml</artifactId>
+                    <groupId>org.opensaml</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xmlsec</artifactId>
+                    <groupId>org.apache.santuario</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ehcache-core</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-jms</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <groupId>javax.ws.rs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-servlet_3.0_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>msv-core</artifactId>
+                    <groupId>net.java.dev.msv</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xsdlib</artifactId>
+                    <groupId>com.sun.msv.datatype.xsd</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-util</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-continuation</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-io</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-http</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-security</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>relaxngDatatype</artifactId>
+                    <groupId>relaxngDatatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xmlbeans</artifactId>
+                    <groupId>org.apache.xmlbeans</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xml-resolver</artifactId>
+                    <groupId>xml-resolver</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jaxb-impl</artifactId>
+                    <groupId>com.sun.xml.bind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jaxb-xjc</artifactId>
+                    <groupId>com.sun.xml.bind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>isorelax</artifactId>
+                    <groupId>isorelax</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>joda-time</artifactId>
+                    <groupId>joda-time</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+       <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+
+        <!-- 配置读取 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
+        <!-- spring cloud alibaba nacos config 依赖 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- spring cloud alibaba nacos discovery 依赖 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
+    <!-- 打包 -->
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <!-- 这样加资源文件主要可以兼容不同的开发工具-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

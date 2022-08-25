@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.generate.code.mapper.TableMapper">
+
+    <!-- 根据查询信息获取信息总数量 -->
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from database_table T where 1=1
+    </select>
+
+    <!-- 根据参数查询所有数据 -->
+    <select id="findAll" resultType="com.papla.cloud.generate.module.domain.Table" parameterType="java.util.Map">
+        SELECT
+            table_schema tableSchema,
+            table_name tableName,
+            create_time createDt,
+            engine enging,
+            table_collation coding,
+            table_comment remark
+        FROM information_schema.TABLES
+        WHERE table_schema = (SELECT DATABASE())
+        <if test="tableName != null and tableName != ''">and T.TABLE_NAME = #{tableName,jdbcType=VARCHAR}</if>
+    </select>
+
+</mapper>

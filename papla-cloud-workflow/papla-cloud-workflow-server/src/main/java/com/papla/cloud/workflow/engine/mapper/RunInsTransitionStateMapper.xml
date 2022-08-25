@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.RunInsTransitionStateMapper">
+
+    <!-- 取得流程实例状态信息 -->
+    <select id="getTransStateList" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.TransStateBean">
+        select
+        distinct trs.instance_id instanceId,
+        trs.transition_id transitionId,
+        trs.transition_state transitionState,
+        trs.biz_status bizStatus,
+        trs.ORDERBY orderBy
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_ins_trans_state trs
+            </when>
+            <otherwise>
+                papla_wf_run_ins_trans_state trs
+            </otherwise>
+        </choose>
+        where trs.instance_id = #{instanceId}
+    </select>
+
+    <!--记录流程流经的连线  -->
+    <insert id="saveTransitionState" parameterType="com.papla.cloud.workflow.engine.modal.TransitionBean">
+        insert into papla_wf_run_ins_trans_state
+        (instance_id,
+        transition_id,
+        transition_state,
+        biz_status,
+        orderby,
+        create_dt,
+        create_by
+        )values(
+        #{instanceId,jdbcType=VARCHAR},
+        #{id,jdbcType=VARCHAR},
+        #{state,jdbcType=VARCHAR},
+        #{bizStatus,jdbcType=VARCHAR},
+        #{orderBy,jdbcType=INTEGER},
+        #{createDt,jdbcType=TIMESTAMP},
+        #{createBy,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 流程回退时, 批量清除连线状态信息 -->
+    <delete id="batDelTransState" parameterType="java.util.Map">
+        delete from papla_wf_run_ins_trans_state
+        where transition_id in
+        (select b.transition_id
+        from work_flow_ins_trans b, work_flow_ins_acts c
+        where b.instance_id = c.instance_id
+        and b.process_id = c.process_id
+        and c.act_num = b.from_act_id
+        and c.instance_id = #{insId}
+        and c.act_id in
+        <foreach collection="acts" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+        and instance_id = #{insId}
+    </delete>
+
+    <!-- 清除实例连线状态信息 -->
+    <delete id="clearInsTransStateByInsId" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_trans_state where instance_id = #{insId}
+    </delete>
+
+    <!-- 获取流程实例的最大连线序号 -->
+    <select id="getMaxInsTransOrder" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select max(t.ORDERBY) from papla_wf_run_ins_trans_state t where t.INSTANCE_ID = #{instanceId}
+    </select>
+
+    <!-- 查询环路流程的回退连线轨迹 -->
+    <select id="getBackTransStateList" parameterType="java.util.HashMap"
+            resultType="com.papla.cloud.workflow.engine.modal.TransStateBean">
+        select t.instance_id instanceId,
+        t.transition_id transitionId,
+        t.transition_state transitionState,
+        t.biz_status bizStatus,
+        t.ORDERBY orderBy,
+        t.create_dt createDt,
+        t.create_by createBy,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_run_ins_trans_state t
+        where t.instance_id = #{insId}
+        and t.ORDERBY >= (select MIN(b.ORDERBY)
+        from (SELECT a.ORDERBY from papla_wf_run_ins_trans_state a where a.INSTANCE_ID = #{insId}
+        and a.TRANSITION_ID in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ) b)
+        order by t.ORDERBY
+    </select>
+
+    <!-- 删除环路流程的回退连线轨迹 -->
+    <delete id="deleteBackTransState" parameterType="java.util.HashMap">
+        delete t.* from papla_wf_run_ins_trans_state t where t.INSTANCE_ID = #{insId}
+        and t.ORDERBY in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            ${item}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDesignMapper">
+
+    <!-- 更新【流程设计】信息 -->
+    <update id="updateProcessJson" parameterType="com.papla.cloud.workflow.engine.modal.ProcessDesignBean">
+        update papla_wf_proc_design T
+        set PROCESS_JSON = #{processJson,jdbcType=LONGVARCHAR}
+        where T.process_id = #{processId,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据【流程设计ID】获取【流程设计】信息 -->
+    <select id="getProcessDesignByProcessId" resultType="com.papla.cloud.workflow.engine.modal.ProcessDesignBean" parameterType="java.util.Map">
+        select
+            T.PROCESS_ID processId ,
+            T.APP_ID appId ,
+            T.ENTITY_ID entityId ,
+            T.PROCESS_CODE processCode ,
+            T.PROCESS_NAME processName ,
+            T.PROCESS_VERSION processVersion ,
+            T.PROCESS_CATEGORY processCategory ,
+            T.ORG_ID orgId ,
+            T.PROCESS_DESC processDesc ,
+            T.PROCESS_JSON processJson ,
+            T.ENABLED enabled ,
+            T.CREATE_DT createDt ,
+            T.CREATE_BY createBy ,
+            T.UPDATE_DT updateDt ,
+            T.UPDATE_BY updateBy
+        from papla_wf_proc_design T
+        where T.process_id = #{processId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getProcessDesignPosts" resultType="java.util.Map">
+        SELECT
+            ui.POST_ID postId,
+            ui.POST_CODE postCode,
+            ui.POST_NAME postName,
+            ui.ORG_NAME orgName,
+            ui.ORG_CODE orgCode,
+            ui.DEPT_CODE deptCode,
+            ui.DEPT_NAME deptName
+        FROM
+            PAPLA_WF_USER_INFO ui
+        GROUP BY
+            ui.POST_ID,
+            ui.POST_CODE,
+            ui.POST_NAME,
+            ui.ORG_NAME,
+            ui.ORG_CODE,
+            ui.DEPT_CODE,
+            ui.DEPT_NAME
+    </select>
+
+</mapper>

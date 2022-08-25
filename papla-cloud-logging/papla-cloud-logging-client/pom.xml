@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>papla-cloud-logging</artifactId>
+        <groupId>com.papla.cloud</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>papla-cloud-logging-client</artifactId>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-jpa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.papla.cloud</groupId>
+            <artifactId>papla-cloud-common-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- spring-cloud-starter-openfeign 依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

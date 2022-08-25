@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ActivityExecutionPathMapper">
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.ActivityExecutorBean" id="executorResultMap">
+        <result property="userId" column="USER_ID"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="empId" column="EMP_ID"/>
+        <result property="empCode" column="EMP_CODE"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+    </resultMap>
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.DynaNodeQueueBean" id="dynaNodeQueueMap">
+        <id property="queueId" column="queue_id"/>
+        <result property="instanceCode" column="instance_code"/>
+        <result property="actCode" column="act_code"/>
+        <result property="orderby" column="orderby"/>
+        <result property="approver" column="approver"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="taskTitle" column="task_title"/>
+        <result property="approveStatus" column="approve_status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createDt" column="create_dt"/>
+        <result property="updateDt" column="update_dt"/>
+    </resultMap>
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.ActivityExecutorBean" id="actExecutorMap">
+        <result property="userId" column="USER_ID"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="empId" column="EMP_ID"/>
+        <result property="empCode" column="EMP_CODE"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+    </resultMap>
+
+
+    <!-- 取得实例已执行的路径（包括当前运行中节点及已完成节点） -->
+    <select id="getExecutePath" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+            a.instance_id instanceId,
+            a.act_id id,
+            a.act_code code,
+            a.act_name name,
+            a.act_category actType
+        from papla_wf_run_ins_act_state st,papla_wf_deploy_acts a
+        where st.act_id = a.act_id
+        and st.instance_id = #{instanceId}
+        and st.act_state in ('completed','running')
+        and a.act_category in ('Notice','Countersign')
+        order by st.end_date
+    </select>
+
+    <!-- 取得流程执行的路径,用于流程回退 -->
+    <select id="getExecutedPath" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select a.instance_id instanceId,
+        a.act_id id,
+        a.act_code code,
+        a.act_name name,
+        a.act_category actType
+        from papla_wf_run_ins_act_state st,
+        papla_wf_deploy_acts a
+        where st.act_id = a.act_id
+        and st.instance_id = #{instanceId}
+        and st.act_state = 'completed'
+        and a.act_category in ('Notice','Countersign')
+        and st.IS_LAST_STATUS = 'Y'
+        order by st.end_date
+    </select>
+
+    <!-- 取得流程实例当前运行中通知/会签节点,用于流程回退 -->
+    <select id="getLastExecutionActivityNode" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select a.instance_id instanceId,a.act_id id,a.act_code code,a.act_name name,a.act_category actType
+        from papla_wf_run_ins_act_state st,
+        papla_wf_deploy_acts a
+        where st.act_id = a.act_id
+        and st.instance_id = #{instanceId}
+        and st.act_state = 'running'
+        and a.act_category in ('Notice','Countersign')
+        order by st.end_date
+    </select>
+
+    <!-- 取得节点待办实际执行人 -->
+    <select id="getActRealExecutor" parameterType="com.papla.cloud.workflow.engine.modal.ActivityBean" resultMap="executorResultMap">
+        select DISTINCT
+            ui.USER_ID ,
+            ui.USER_NAME ,
+            ui.EMP_ID ,
+            ui.EMP_NAME
+        from papla_wf_run_ins_task task,papla_wf_user_info ui,papla_wf_run_ins_act_state state
+        where task.assign_user = ui.user_id
+        and task.act_id = state.act_id
+        and task.instance_id = state.instance_id
+        and task.act_id = #{id}
+        and task.instance_id = #{instanceId}
+        and task.task_effective = 'Y'
+        and ((state.act_state = 'completed' and task.close_cause != 'countersign') or state.act_state = 'running')
+        and task.create_type != 'consult'
+        and task.create_type != 'copyto'
+    </select>
+
+    <!-- 获取完成节点的实际执行人信息 -->
+    <select id="getCommpletedActRealExecutors" parameterType="com.papla.cloud.workflow.engine.modal.ActivityBean" resultMap="executorResultMap">
+        select
+            wu.USER_ID ,
+            wu.USER_NAME ,
+            wu.EMP_ID ,
+            wu.EMP_NAME
+        from papla_wf_run_ins_task t, papla_wf_user_info wu
+        where t.ASSIGN_USER = xp.USER_ID
+        and t.INSTANCE_id = #{instanceId}
+        and t.ACT_ID = #{id}
+        and t.TASK_EFFECTIVE = 'Y'
+        and t.create_type != 'consult'
+        and t.create_type != 'copyto'
+        and t.close_cause != 'countersign'
+        and t.BEGIN_DATE =
+            (select min(c.BEGIN_DATE)
+                from (
+                    select d.BEGIN_DATE from papla_wf_run_ins_task d
+                    where d.ACT_ID = #{id}
+                    and d.INSTANCE_ID = #{instanceId}
+                    and d.task_effective = 'Y'
+                    ) c
+            )
+    </select>
+
+    <!-- 获取当前节点的动态路径信息 -->
+    <select id="getCurrentNodeQueue" parameterType="java.util.HashMap" resultMap="dynaNodeQueueMap">
+        select t.queue_id,
+            t.instance_code,
+            t.act_code,
+            t.orderby,
+            t.node_name,
+            t.task_title,
+            t.approver,
+            t.approve_status,
+            t.create_dt,
+            t.create_by,
+            t.update_by,
+            t.update_dt
+        from papla_wf_run_ins_act_queue t
+        where t.orderby = (select min(a.orderby) from papla_wf_run_ins_act_queue a
+        where a.instance_code = #{insCode}
+        and a.act_code = #{actCode}
+        <if test="list !=null ">
+            and a.queue_id not in
+            <foreach collection="list" index="index" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        and a.approve_status = 'open')
+        and t.act_code = #{actCode}
+        and t.instance_code = #{insCode}
+        and t.approve_status = 'open'
+    </select>
+
+    <!-- 获取当前节点运行中的动态路径 -->
+    <select id="getRunningNodeQueue" parameterType="java.util.HashMap" resultMap="dynaNodeQueueMap">
+        select t.queue_id,
+            t.instance_code,
+            t.act_code,
+            t.orderby,
+            t.node_name,
+            t.task_title,
+            t.approver,
+            t.approve_status,
+            t.create_dt,
+            t.create_by,
+            t.update_by,
+            t.update_dt
+        from papla_wf_run_ins_act_queue t
+        where t.act_code = #{actCode}
+        and t.instance_code = #{insCode}
+        and t.approve_status = 'running'
+    </select>
+
+    <!-- 获取当前节点第一条已审批的队列信息 -->
+    <select id="getFirstClosedNodeQueue" parameterType="java.util.HashMap" resultMap="dynaNodeQueueMap">
+        select t.queue_id,
+            t.instance_code,
+            t.act_code,
+            t.orderby,
+            t.node_name,
+            t.task_title,
+            t.approver,
+            t.approve_status,
+            t.create_dt,
+            t.create_by,
+            t.update_by,
+            t.update_dt
+        from papla_wf_run_ins_act_queue t
+        where t.act_code = #{actCode}
+        and t.instance_code = #{insCode}
+        and t.approve_status = 'closed'
+        and t.orderby = (SELECT MIN(A.ORDERBY)
+        FROM papla_wf_run_ins_act_queue A
+        WHERE A.INSTANCE_CODE = #{insCode}
+        AND A.ACT_CODE = #{actCode}
+        AND A.approve_status = 'closed')
+    </select>
+
+    <!-- 获取节点执行人信息 -->
+    <select id="getExecutors" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.ActivityExecutorBean">
+        select
+            wu.user_id userId,
+            wu.user_name userName,
+            wu.emp_id empId,
+            wu.emp_code empCode,
+            wu.emp_name empName
+        from papla_wf_user_info wu
+        where wu.user_id = #{userId}
+    </select>
+
+    <!-- 获取动态节点队列执行人 -->
+    <select id="getDynaNodeExecutor" parameterType="java.util.HashMap" resultMap="actExecutorMap">
+        SELECT
+            WU.USER_ID,
+            WU.USER_NAME,
+            WU.EMP_ID,
+            WU.EMP_CODE,
+            WU.EMP_NAME
+        FROM papla_wf_run_ins_act_queue T,  WU
+        WHERE T.APPROVER = WU.USER_ID+
+        AND T.INSTANCE_CODE = #{insCode}
+        AND T.ACT_CODE = #{actCode}
+        AND T.ORDERBY = (SELECT MIN(A.ORDERBY)
+        FROM papla_wf_run_ins_act_queue A
+        WHERE A.INSTANCE_CODE = #{insCode}
+        AND A.ACT_CODE = #{actCode})
+
+    </select>
+</mapper>

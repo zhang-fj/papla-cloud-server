@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.EntityFormMapper">
+
+    <!-- 获取【流程关联表单】信息 -->
+    <select id="getEntityFormList" resultType="com.papla.cloud.workflow.engine.modal.EntityFormBean" parameterType="java.util.Map">
+        select
+        T.FORM_ID formId ,
+        T.FORM_URL formUrl ,
+        T.FORM_DESC formDesc ,
+        T.APP_ID appId ,
+        T.ENTITY_ID entityId ,
+        T.CLIENT_TYPE clientType ,
+        T.ENABLED enabled ,
+        T.CREATE_DT createDt ,
+        T.CREATE_BY createBy ,
+        T.UPDATE_DT updateDt ,
+        T.UPDATE_BY updateBy
+        from papla_wf_entity_forms T
+        where t.entity_id = #{entityId,jdbcType=VARCHAR}
+        and T.ENABLED = 'Y'
+        <if test="clientType != null and clientType != ''">
+            and T.CLIENT_TYPE = #{clientType,jdbcType=VARCHAR}
+        </if>
+        <if test="formId != null and formId != ''">
+            and T.FORM_ID = #{formId,jdbcType=VARCHAR}
+        </if>
+        <if test="formDesc !=null and formDesc != ''">
+            and t.form_desc like '%${formDesc}%'
+        </if>
+    </select>
+
+</mapper>

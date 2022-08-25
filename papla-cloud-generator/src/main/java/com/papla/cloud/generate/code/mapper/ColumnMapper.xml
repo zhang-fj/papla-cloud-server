@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.generate.code.mapper.ColumnMapper">
+
+    <!-- 根据查询信息获取信息总数量 -->
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from database_column T where 1=1
+    </select>
+
+    <!-- 根据参数查询所有数据 -->
+    <select id="findAll" resultType="com.papla.cloud.generate.module.domain.Column" parameterType="java.util.Map">
+        SELECT
+            column_name columnName,
+            data_type columnType,
+            case when is_nullable = 'YES' then 'NO' else 'YES' end notNull,
+            column_comment remark,
+            column_key keyType,
+            ordinal_position sort,
+            extra
+        FROM information_schema.COLUMNS
+        WHERE table_schema = (SELECT DATABASE()) AND TABLE_NAME = #{tableName,jdbcType=VARCHAR}
+        ORDER BY ordinal_position
+    </select>
+
+</mapper>

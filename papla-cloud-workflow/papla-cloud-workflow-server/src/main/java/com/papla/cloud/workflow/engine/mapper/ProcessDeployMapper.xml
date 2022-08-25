@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployMapper">
+
+    <!-- 保存【流程部署】信息 -->
+    <insert id="saveProcessDeploy" parameterType="com.papla.cloud.workflow.engine.modal.ProcessDeployBean">
+        insert into papla_wf_proc_deploy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deployId != null">DEPLOY_ID,</if>
+            <if test="appId != null">APP_ID,</if>
+            <if test="processId != null">PROCESS_ID,</if>
+            <if test="entityId != null">ENTITY_ID,</if>
+            <if test="processCode != null">PROCESS_CODE,</if>
+            <if test="processName != null">PROCESS_NAME,</if>
+            <if test="processStatus != null">PROCESS_STATUS,</if>
+            <if test="processVersion != null">PROCESS_VERSION,</if>
+            <if test="processCategory != null">PROCESS_CATEGORY,</if>
+            <if test="orgId != null">ORG_ID,</if>
+            <if test="processDesc != null">PROCESS_DESC,</if>
+            <if test="processJson != null">PROCESS_JSON,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deployId != null">#{deployId,jdbcType=VARCHAR},</if>
+            <if test="appId != null">#{appId,jdbcType=VARCHAR},</if>
+            <if test="processId != null">#{processId,jdbcType=VARCHAR},</if>
+            <if test="entityId != null">#{entityId,jdbcType=VARCHAR},</if>
+            <if test="processCode != null">#{processCode,jdbcType=VARCHAR},</if>
+            <if test="processName != null">#{processName,jdbcType=VARCHAR},</if>
+            <if test="processStatus != null">#{processStatus,jdbcType=VARCHAR},</if>
+            <if test="processVersion != null">#{processVersion,jdbcType=NUMERIC},</if>
+            <if test="processCategory != null">#{processCategory,jdbcType=VARCHAR},</if>
+            <if test="orgId != null">#{orgId,jdbcType=VARCHAR},</if>
+            <if test="processDesc != null">#{processDesc,jdbcType=VARCHAR},</if>
+            <if test="processJson != null">#{processJson,jdbcType=LONGVARCHAR},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改【流程部署】状态 -->
+    <update id="updateProcessDeployStatus" parameterType="java.util.Map">
+        update papla_wf_proc_deploy T set T.PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        where T.process_id = #{processId,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据【流程设计】ID获取最大版本 -->
+    <select id="getMaxVersionByProcessId" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select MAX(T.PROCESS_VERSION) from papla_wf_proc_deploy T
+        where T.process_id = #{processId,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据【流程编码】获取【流程部署ID】 -->
+    <select id="getProcessDeployIdByProcessCode" parameterType="java.lang.String" resultType="java.lang.String">
+        select t.deploy_id from papla_wf_proc_deploy t where t.process_code = #{processCode} and t.enabled = 'Y' and
+        T.process_status = 'D'
+    </select>
+
+    <!-- 根据【流程部署ID】获取【流程部署】信息 -->
+    <select id="getProcessDeployById" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.ProcessDeployBean">
+        select
+        d.deploy_id deployId,
+        d.app_id appId,
+        d.entity_id entityId,
+        d.org_id orgId,
+        d.process_id processId,
+        d.process_code processCode,
+        d.process_name processName,
+        d.process_version processVersion,
+        d.process_category processCategory,
+        d.process_desc processDesc,
+        d.enabled enabled,
+        d.process_json processJson
+        from papla_wf_proc_deploy d
+        where d.deploy_id = #{deployId,jdbcType=VARCHAR}
+    </select>
+
+
+</mapper>

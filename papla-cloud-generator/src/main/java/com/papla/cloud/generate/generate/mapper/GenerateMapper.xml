@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.generate.generate.mapper.GenerateMapper">
+
+    <!-- 根据参数查询所有数据 -->
+    <select id="queryGenerateConfigList" resultType="com.papla.cloud.generate.generate.domain.ModuleGenerateConfig" parameterType="java.util.Map">
+        select
+            tt.ID tableTempId,
+            tf.ID tempFileId,
+            tt.TABLE_ID tableId,
+            mt.API_ALIAS apiAlias,
+            mt.TABLE_NAME tableName,
+            mt.entity_name entityName,
+            mi.PACKAGE_NAME packageName,
+            tt.TEMP_CATE tempCate,
+            tt.COVER cover,
+            tt.GAN_API ganApi,
+            tt.GEN_MENU genMenu,
+            tf.TEMP_FILE_PATH tempFilePath,
+            tf.TEMP_FILE_NAME tempFileName,
+            tf.TEMP_CONTENT   tempContent,
+            tf.REQUIRED required,
+            mp.PROJECT_PATH projectPath,
+            mp.PAGE_PATH pagePath,
+            mi.MODULE_PATH modulePath,
+            tf.GEN_ROOT_PATH genSrcPath,
+            tf.GEN_FILE_PREFIX genFilePrefix,
+            tf.GEN_FILE_SUFFIX genFileSuffix,
+            tf.GEN_FILE_PATH genFilePath,
+            tf.GEN_FILE_FORMAT genFileFormat
+        from papla_module_table_temp tt,papla_code_temp_file tf,papla_module_table mt,papla_module_item
+        mi,papla_module_project mp
+        where tt.TABLE_ID = mt.id and tt.TEMP_FILE_ID = tf.id and tt.TABLE_ID = mt.id and mt.MODULE_ID = mi.id and
+        mi.PROJECT_ID = mp.id
+        and tt.TABLE_ID = #{tableId,jdbcType=VARCHAR}
+        order by tf.sort
+    </select>
+
+</mapper>

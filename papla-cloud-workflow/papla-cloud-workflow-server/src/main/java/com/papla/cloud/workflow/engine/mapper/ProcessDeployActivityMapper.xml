@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployActivityMapper">
+
+    <!-- 批量保存【流程部署】节点信息 -->
+    <insert id="saveActivity" parameterType="java.util.List">
+        insert into papla_wf_deploy_acts (
+        process_id,deploy_id,act_id, act_code, act_name, act_category, act_desc, act_num, create_by, create_dt
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.processId,jdbcType=VARCHAR},
+            #{item.deployId,jdbcType=VARCHAR},
+            #{item.id,jdbcType=VARCHAR},
+            #{item.code,jdbcType=VARCHAR},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.actType,jdbcType=VARCHAR},
+            #{item.actDesc,jdbcType=VARCHAR},
+            #{item.num,jdbcType=INTEGER},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=TIMESTAMP}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 根据【流程部署Id】获取【流程节点】列表 -->
+    <select id="getDeployActivityBeans" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select t.process_id processId,
+        t.deploy_id deployId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num
+        from papla_wf_deploy_acts t
+        where t.deploy_id = #{deployId,jdbcType=VARCHAR}
+        order by t.act_num
+    </select>
+
+    <!-- 根据【流程实例ID】获取【流程节点】列表 -->
+    <select id="getInstanceActivityBeans" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+        ri.instance_id instanceId,
+        t.process_id processId,
+        t.deploy_id deployId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num,
+        t.create_by createBy,
+        t.create_dt createDate,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_acts t,papla_wf_run_instance ri
+        where t.deploy_id=ri.deploy_id
+        and ri.instance_id = #{instanceId}
+    </select>
+
+    <!-- 根据【流程实例ID】获取开始【流程节点】信息 -->
+    <select id="getStartActivityBean" parameterType="java.lang.String"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+        ri.instance_id instanceId,
+        t.process_id processId,
+        t.deploy_id deployId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num,
+        t.create_by createBy,
+        t.create_dt createDate,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_acts t,papla_wf_run_instance ri
+        where t.deploy_id=ri.deploy_id
+        and ri.instance_id = #{instanceId}
+        and t.act_category = 'Start'
+    </select>
+
+    <!-- 根据【流程实例ID】和【流程节点ID】获取单个【流程节点】信息 -->
+    <select id="getInstanceActivityBean" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+        ri.instance_id instanceId,
+        t.process_id processId,
+        t.deploy_id deployId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num,
+        t.create_by createBy,
+        t.create_dt createDate,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_acts t,papla_wf_run_instance ri
+        where t.deploy_id=ri.deploy_id
+        and ri.instance_id = #{instanceId}
+        and t.act_id = #{actId,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据【流程实例ID】和【流程节点ID】获取单个【流程节点类型】 -->
+    <select id="getInstanceActivityCategory" parameterType="java.util.Map" resultType="java.lang.String">
+        select
+        t.act_category
+        from papla_wf_deploy_acts t,papla_wf_run_instance ri
+        where t.deploy_id=ri.deploy_id
+        and ri.instance_id = #{instanceId}
+        and t.act_id = #{actId}
+    </select>
+
+    <!-- 判断【流程节点】是否绑定【业务表单】 -->
+    <select id="isBoundForm" parameterType="java.util.Map" resultType="java.lang.String">
+        select a.property_value val from papla_wf_deploy_act_attrs a
+        where exists (select 1 from papla_wf_deploy_acts b
+        where a.act_id = b.act_id
+        and b.deploy_id = #{deployId}
+        and b.act_category = #{category})
+        and a.property_code = #{propCode}
+    </select>
+
+    <!-- 根据【任务ID】和【流程实例ID】获取运行期任务对应的【流程节点】信息 -->
+    <select id="getBaseActivityBean" parameterType="java.util.HashMap"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+        ri.instance_id instanceId,
+        ri.instance_code instanceCode,
+        t.deploy_id deployId,
+        t.process_id processId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num,
+        t.create_by createBy,
+        t.create_dt createDate,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_acts t,papla_wf_run_instance ri
+        where t.deploy_id=ri.deploy_id
+        and exists (select 1 from papla_wf_run_ins_task a
+        where ri.instance_id = a.instance_id
+        and t.act_id = a.act_id
+        and a.task_id = #{taskId}
+        )
+        and ri.instance_id = #{insId}
+    </select>
+
+    <!-- 根据【任务ID】和【流程实例ID】获取已归档任务对应的【流程节点】信息  -->
+    <select id="getArchBaseActivityBean" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityBean">
+        select
+        ri.instance_id instanceId,
+        ri.instance_code instanceCode,
+        t.deploy_id deployId,
+        t.act_id id,
+        t.act_code code,
+        t.act_name name,
+        t.act_category actType,
+        t.act_desc actDesc,
+        t.act_num num,
+        t.create_by createBy,
+        t.create_dt createDate,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_deploy_acts t,papla_wf_arch_instance ri
+        where t.deploy_id=ri.deploy_id
+        and exists (select 1 from papla_wf_arch_ins_task a
+        where ri.instance_id = a.instance_id
+        and t.act_id = a.act_id
+        and a.task_id = #{taskId}
+        )
+        and ri.instance_id = #{insId}
+    </select>
+
+</mapper>

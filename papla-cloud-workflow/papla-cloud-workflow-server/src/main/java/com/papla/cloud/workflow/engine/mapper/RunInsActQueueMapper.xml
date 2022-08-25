@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.RunInsActQueueMapper">
+
+    <resultMap id="dynaNodeQueueMap" type="com.papla.cloud.workflow.engine.modal.DynaNodeQueueBean">
+        <id property="queueId" column="queue_id"/>
+        <result property="instanceCode" column="instance_code"/>
+        <result property="actCode" column="act_code"/>
+        <result property="orderby" column="orderby"/>
+        <result property="approver" column="approver"/>
+        <result property="taskTitle" column="task_title"/>
+        <result property="approveStatus" column="approve_status"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="empId" column="emp_id"/>
+        <result property="empCode" column="emp_code"/>
+        <result property="empName" column="emp_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createDt" column="create_dt"/>
+        <result property="updateDt" column="update_dt"/>
+    </resultMap>
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.ActivityBean" id="activityBeanMap">
+        <result property="id" column="ACT_ID"/>
+        <result property="processId" column="PROCESS_ID"/>
+        <result property="code" column="ACT_CODE"/>
+        <result property="name" column="ACT_NAME"/>
+        <result property="num" column="ACT_NUM"/>
+        <result property="actType" column="ACT_CATEGORY"/>
+        <result property="instanceId" column="INSTANCE_ID"/>
+        <collection property="actPropertyBeanList" ofType="com.papla.cloud.workflow.engine.modal.ActivityPropertyBean">
+            <result property="instanceId" column="INSTANCE_ID"/>
+            <result property="actId" column="ACT_ID"/>
+            <result property="propertyCode" column="PROPERTY_CODE"/>
+            <result property="propertyName" column="PROPERTY_NAME"/>
+            <result property="propertyValue" column="PROPERTY_VALUE"/>
+        </collection>
+    </resultMap>
+
+    <!-- 查询流程实例动态节点的审批队列 -->
+    <select id="getDynaActQueue" parameterType="java.util.Map" resultMap="dynaNodeQueueMap">
+        select xq.queue_id,
+        xq.instance_code,
+        xq.act_code,
+        xq.orderby,
+        xq.approver,
+        xq.task_title,
+        xq.approve_status,
+        xu.user_id,
+        xu.user_name,
+        xe.emp_id,
+        xe.emp_code,
+        xe.emp_name,
+        xq.create_dt,
+        xq.create_by,
+        xq.update_dt,
+        xq.update_by
+        from papla_wf_run_ins_act_queue xq, xip_pub_users xu, xip_pub_emps xe
+        where xq.approver = xu.user_id
+        and xu.emp_id = xe.emp_id
+        and xq.instance_code = #{insCode}
+        and xq.act_code = #{actCode}
+        order by xq.orderby
+    </select>
+
+    <!-- 查询流程实例某个动态通知节点的审批队列信息 -->
+    <select id="getInsDynaActQueue" parameterType="java.util.HashMap" resultMap="dynaNodeQueueMap">
+        select xq.queue_id,
+        xq.instance_code,
+        xq.act_code,
+        xq.orderby,
+        xq.approver,
+        xq.task_title,
+        xq.approve_status,
+        xq.create_dt,
+        xq.create_by,
+        xq.update_dt,
+        xq.update_by
+        <choose>
+            <when test="isArched =='Y'.toString() ">
+                from work_flow_arch_act_queue xq
+            </when>
+            <otherwise>
+                from papla_wf_run_ins_act_queue xq
+            </otherwise>
+        </choose>
+        where xq.instance_code =
+        (select a.instance_code
+        from papla_wf_run_instance a
+        where a.instance_id = #{insId})
+        and xq.act_code = #{actCode}
+        order by xq.orderby
+    </select>
+
+    <!-- 查询流程实例下所有的动态通知节点信息 -->
+    <select id="getDynaActivities" parameterType="java.lang.String" resultMap="activityBeanMap">
+        select a.ACT_CATEGORY,
+        a.ACT_ID,
+        a.PROCESS_ID,
+        a.ACT_CODE,
+        a.ACT_NAME,
+        a.ACT_NUM,
+        ri.INSTANCE_ID,
+        p.PROPERTY_CODE,
+        p.PROPERTY_NAME,
+        p.PROPERTY_VALUE
+        from papla_wf_deploy_acts a, papla_wf_deploy_act_attrs p,papla_wf_run_instance ri
+        where a.DEPLOY_ID = ri.DEPLOY_ID
+        and a.ACT_ID = p.ACT_ID
+        and ri.INSTANCE_ID = #{instanceId}
+        and p.PROPERTY_CODE in ('a_is_dynamic_node', 'a_dyna_func_type', 'a_dyna_func_name')
+        and a.ACT_CATEGORY = 'Notice'
+        and exists (select 1 from papla_wf_deploy_act_attrs ap
+        where a.DEPLOY_ID = ap.DEPLOY_ID
+        and a.ACT_ID = ap.ACT_ID
+        and ap.PROPERTY_CODE = 'a_is_dynamic_node'
+        and ap.PROPERTY_VALUE = 'Y')
+    </select>
+
+    <!-- 删除动态通知节点的审批队列信息 -->
+    <delete id="delDynaActivityQueue" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_act_queue where instance_code = #{insCode}
+    </delete>
+
+    <!-- 修改通知节点动态审批队列状态 -->
+    <update id="updDynaActQueueStatus" parameterType="java.util.HashMap">
+        update papla_wf_run_ins_act_queue t
+        set t.approve_status = #{newStatus, jdbcType=VARCHAR},
+        t.update_dt = #{bean.updateDt, jdbcType=TIMESTAMP},
+        t.update_by = #{bean.updateBy, jdbcType=VARCHAR}
+        where t.queue_id = #{bean.queueId}
+    </update>
+
+    <!-- 批量更新回退路径中动态通知节点的审批队列状态 -->
+    <update id="batchUpDynaActQueueStatus" parameterType="java.util.HashMap">
+        update papla_wf_run_ins_act_queue t
+        set t.approve_status = 'open',
+        t.update_dt = #{cdate, jdbcType=TIMESTAMP},
+        t.update_by = #{userId, jdbcType=VARCHAR}
+        where t.instance_code = #{insCode}
+        <if test="list != null">
+            and t.act_code in
+            <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+</mapper>

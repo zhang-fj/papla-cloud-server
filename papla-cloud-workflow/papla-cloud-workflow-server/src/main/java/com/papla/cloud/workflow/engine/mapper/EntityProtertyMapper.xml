@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.EntityProtertyMapper">
+
+    <!-- 根据【实体ID】获取【实体属性】列表 -->
+    <select id="getEntityAttrList" resultType="com.papla.cloud.workflow.engine.modal.EntityAttrBean" parameterType="java.util.Map">
+        select
+        T.ATTR_ID attrId ,
+        T.ENTITY_ID entityId ,
+        T.ATTR_CODE attrCode ,
+        T.ATTR_NAME attrName ,
+        T.ATTR_CATEGORY attrCategory ,
+        T.FUNC_TYPE funcType ,
+        T.FUNC_VALUE funcValue ,
+        T.ATTR_DESC attrDesc ,
+        T.ATTR_DATA_TYPE attrDataType ,
+        T.CREATE_DT createDt ,
+        T.CREATE_BY createBy ,
+        T.UPDATE_DT updateDt ,
+        T.UPDATE_BY updateBy
+        from papla_wf_entity_attrs T
+        where T.ENTITY_ID =#{entityId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

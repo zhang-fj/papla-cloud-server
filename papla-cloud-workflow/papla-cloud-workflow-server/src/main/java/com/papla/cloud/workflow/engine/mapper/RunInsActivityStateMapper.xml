@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.RunInsActivityStateMapper">
+
+    <resultMap type="com.papla.cloud.workflow.engine.modal.ActivityStateBean" id="activityStateResultMap">
+        <result property="instanceId" column="INSTANCE_ID"/>
+        <result property="actId" column="ACT_ID"/>
+        <result property="actCode" column="ACT_CODE"/>
+        <result property="actState" column="ACT_STATE"/>
+        <result property="beginDate" column="BEGIN_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="createDt" column="create_dt"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateDt" column="update_dt"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="orderBy" column="ORDERBY"/>
+        <result property="isLastStatus" column="IS_LAST_STATUS"/>
+        <result property="actCategory" column="ACT_CATEGORY"/>
+    </resultMap>
+
+    <!-- 启动时创建【流程节点状态】信息  -->
+    <insert id="saveActivityState" parameterType="com.papla.cloud.workflow.engine.modal.ProcessInstanceBean">
+        insert into papla_wf_run_ins_act_state
+        (instance_id, act_id, act_state, begin_date, create_dt, create_by)
+        (select #{instanceId,jdbcType=VARCHAR},
+        act_id,
+        'started',
+        #{beginDate,jdbcType=TIMESTAMP},
+        #{createDt,jdbcType=TIMESTAMP},
+        #{createBy,jdbcType=VARCHAR}
+        from papla_wf_deploy_acts t
+        where t.deploy_id = #{deployId})
+    </insert>
+
+    <!-- 创建单条节点状态信息 -->
+    <insert id="insertActivityState" parameterType="com.papla.cloud.workflow.engine.modal.ActivityStateBean">
+        insert into papla_wf_run_ins_act_state
+        (instance_id,
+        act_id,
+        act_state,
+        begin_date,
+        end_date,
+        orderby,
+        create_dt,
+        create_by)
+        values
+        (#{instanceId,jdbcType=VARCHAR},
+        #{actId,jdbcType=VARCHAR},
+        #{actState,jdbcType=VARCHAR},
+        #{beginDate,jdbcType=TIMESTAMP},
+        #{endDate,jdbcType=TIMESTAMP},
+        #{orderBy,jdbcType=INTEGER},
+        #{createDt,jdbcType=TIMESTAMP},
+        #{createBy,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 更新【流程实例】下某个【节点状态  -->
+    <update id="updateActivityState" parameterType="com.papla.cloud.workflow.engine.modal.ActivityStateBean">
+        update papla_wf_run_ins_act_state
+        <set>
+            <if test="actState != null">
+                act_state = #{actState,jdbcType=VARCHAR},
+            </if>
+            <if test="beginDate != null">
+                begin_date = #{beginDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDt != null">
+                update_dt = #{updateDt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="isLastStatus != null">
+                is_last_status = #{isLastStatus,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where instance_id = #{instanceId}
+        and act_id = #{actId}
+        and is_last_status = 'Y'
+    </update>
+
+    <!-- 【撤销流程】或【重启撤销】流程时, 批量更新【节点状态】信息 -->
+    <update id="batchUpdateActivityState" parameterType="java.util.Map">
+        update papla_wf_run_ins_act_state t
+        set t.act_state = #{actState,jdbcType=VARCHAR},
+        t.end_date = #{endDate,jdbcType=TIMESTAMP},
+        t.update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        t.update_by = #{updateBy,jdbcType=VARCHAR}
+        where t.instance_id = #{insId}
+        <if test=" acts != null ">
+            and t.act_id in
+            <foreach collection="acts" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <!-- 删除【流程实例】下的【节点状态】信息 -->
+    <delete id="deleteActivityStateByInstanceId" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_act_state where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 根据【流程实例ID】获取【节点状态】列表 -->
+    <select id="getActivityStateList" parameterType="java.lang.String" resultMap="activityStateResultMap">
+        select st.instance_id ,
+        st.act_id ,
+        st.act_state ,
+        st.begin_date ,
+        st.end_date ,
+        st.create_dt ,
+        st.create_by ,
+        st.update_dt ,
+        st.update_by ,
+        st.orderby,
+        st.is_last_status
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_ins_act_state ST
+            </when>
+            <otherwise>
+                papla_wf_run_ins_act_state ST
+            </otherwise>
+        </choose>
+        where st.instance_id = #{instanceId}
+        and st.is_last_status = 'Y'
+    </select>
+
+    <!-- 查询最大的顺序号 -->
+    <select id="getMaxOrderBy" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select max(t.ORDERBY) from papla_wf_run_ins_act_state t where t.INSTANCE_ID = #{instanceId}
+    </select>
+
+    <!-- 查询环路流程的回退节点轨迹 -->
+    <select id="getBackActivityState" parameterType="java.util.HashMap" resultMap="activityStateResultMap">
+        SELECT t.INSTANCE_ID,
+        t.ACT_ID,
+        act.ACT_CODE,
+        t.ACT_STATE,
+        t.BEGIN_DATE,
+        t.END_DATE,
+        t.create_dt,
+        t.create_by,
+        t.update_dt,
+        t.update_by,
+        t.ORDERBY,
+        t.IS_LAST_STATUS,
+        act.ACT_CATEGORY
+        from papla_wf_run_ins_act_state t,papla_wf_deploy_acts act
+        where t.act_id = act.act_id
+        and t.INSTANCE_ID = #{insId}
+        and t.ORDERBY >= (SELECT MIN(b.ORDERBY) from (select a.ORDERBY from papla_wf_run_ins_act_state a
+        where a.INSTANCE_ID = #{insId} and a.ACT_ID = #{actId}) b)
+        order by t.orderby
+    </select>
+
+    <!-- 删除流程回退节点轨迹信息 -->
+    <delete id="deleteBackActState" parameterType="java.util.HashMap">
+        delete t.* from papla_wf_run_ins_act_state t where t.INSTANCE_ID = #{insId}
+        and t.ORDERBY in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            ${item}
+        </foreach>
+    </delete>
+
+    <!-- 获取【流程实例】节点状态 -->
+    <select id="getInstanceActivityState" parameterType="java.util.Map" resultType="java.lang.String">
+        select
+        t.act_state
+        from papla_wf_run_ins_act_state t
+        where t.instance_id = #{instanceId}
+        and t.act_id = #{actId}
+    </select>
+
+    <!-- 获取【获取实例】最新节点状态-->
+    <select id="getLastActivityState" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ActivityStateBean">
+        select
+        t.instance_id instanceId,
+        t.act_id actId,
+        t.act_state actState,
+        t.begin_date beginDate,
+        t.end_date endDate,
+        t.orderby orderBy,
+        t.is_last_status isLastStatus,
+        t.create_dt createDt,
+        t.create_by createBy,
+        t.update_dt updateDt,
+        t.update_by updateBy
+        from papla_wf_run_ins_act_state t
+        where t.instance_id = #{instanceId}
+        and t.act_id = #{actId}
+        and t.is_last_status = 'Y'
+    </select>
+
+</mapper>

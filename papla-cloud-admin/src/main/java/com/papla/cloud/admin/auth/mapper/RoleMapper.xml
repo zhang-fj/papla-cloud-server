@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.auth.mapper.RoleMapper">
+
+	<sql id="columns">
+		T.ID id ,
+		T.ROLE_CODE roleCode ,
+		T.ROLE_NAME roleName ,
+		T.ROLE_DESC roleDesc ,
+		T.ENABLED enabled ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_auth_role T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.auth.domain.Role" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_auth_role T where 1=1
+		<if test="roleCode != null and roleCode != ''"> and T.ROLE_CODE like concat('%',#{roleCode,jdbcType=VARCHAR},'%')</if>
+		<if test="roleName != null and roleName != ''"> and T.ROLE_NAME like concat('%',#{roleName,jdbcType=VARCHAR},'%')</if>
+		<if test="enabled != null and enabled != ''"> and T.ENABLED = #{enabled,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.auth.domain.Role" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_role T
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.auth.domain.Role" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_role T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.admin.auth.domain.Role">
+		insert into papla_auth_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="id != null">ID,</if>
+	 		<if test="roleCode != null">ROLE_CODE,</if>
+	 		<if test="roleName != null">ROLE_NAME,</if>
+	 		<if test="roleDesc != null">ROLE_DESC,</if>
+	 		<if test="enabled != null">ENABLED,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id,jdbcType=VARCHAR},</if>
+			<if test="roleCode != null">#{roleCode,jdbcType=VARCHAR},</if>
+			<if test="roleName != null">#{roleName,jdbcType=VARCHAR},</if>
+			<if test="roleDesc != null">#{roleDesc,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.admin.auth.domain.Role">
+		update papla_auth_role T
+		<set>
+			<if test="roleCode != null">ROLE_CODE = #{roleCode,jdbcType=VARCHAR},</if>
+			<if test="roleName != null">ROLE_NAME = #{roleName,jdbcType=VARCHAR},</if>
+			<if test="roleDesc != null">ROLE_DESC = #{roleDesc,jdbcType=VARCHAR},</if>
+			<if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_auth_role where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_auth_role where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.auth.domain.Role">
+		delete from papla_auth_role 
+		where  ID = #{id,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

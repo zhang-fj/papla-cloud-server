@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.RunInsEntityAttrValueMapper">
+
+    <!-- 批量保存【内置流程实体属性值】 -->
+    <insert id="saveInnerEntityAttrValue" parameterType="java.util.List">
+        INSERT INTO papla_wf_run_ins_attr_value
+        (INSTANCE_ID,
+        ENTITY_ID,
+        ATTR_ID,
+        ATTR_CODE,
+        ATTR_NAME,
+        ATTR_RESULT,
+        ATTR_CATEGORY,
+        ATTR_DATA_TYPE,
+        create_dt,
+        create_by,
+        IS_SYS_INNER)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.instanceId, jdbcType=VARCHAR },
+            #{item.entityId, jdbcType=VARCHAR},
+            #{item.attrId, jdbcType=VARCHAR},
+            #{item.attrCode, jdbcType=VARCHAR },
+            #{item.attrName, jdbcType=VARCHAR },
+            #{item.attrResult, jdbcType=VARCHAR },
+            #{item.attrCategory, jdbcType=VARCHAR},
+            '1',
+            #{item.createDt, jdbcType=TIMESTAMP},
+            #{item.createBy, jdbcType=VARCHAR},
+            #{item.sysInnerVar, jdbcType=VARCHAR}
+            from wb_dual
+        </foreach>
+    </insert>
+
+    <!--根据【流程实例ID】获取【流程实例实体属性值】列表  -->
+    <select id="getInstanceEntityAttrValueList" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.InstanceEntityAttrBean">
+        select
+        ar.instance_id instanceId,
+        ar.entity_id entityId,
+        ar.attr_id attrId,
+        ar.attr_code attrCode,
+        ar.attr_name attrName,
+        ar.attr_category attrCategory,
+        ar.attr_data_type attrDataType,
+        ar.func_type funcType,
+        ar.func_value funcValue,
+        ar.attr_result attrResult,
+        ar.attr_desc attrDesc,
+        ar.create_dt createDt,
+        ar.create_by createBy,
+        ar.update_dt updateDt,
+        ar.update_by updateBy
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_ins_attr_value ar
+            </when>
+            <otherwise>
+                papla_wf_run_ins_attr_value ar
+            </otherwise>
+        </choose>
+        where ar.instance_id = #{instanceId}
+    </select>
+
+    <!-- 根据【流程实例编码】查找【流程实例实体属性值】列表 -->
+    <select id="getInstanceEntityAttrValueListByInstanceCode" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.InstanceEntityAttrBean">
+        select ar.instance_id instanceId,
+        ar.entity_id entityId,
+        ar.attr_id attrId,
+        ar.attr_code attrCode,
+        ar.attr_name attrName,
+        ar.attr_category attrCategory,
+        ar.attr_data_type attrDataType,
+        ar.func_type funcType,
+        ar.func_value funcValue,
+        ar.attr_result attrResult,
+        ar.attr_desc attrDesc,
+        ar.create_dt createDt,
+        ar.create_by createBy,
+        ar.update_dt updateDt,
+        ar.update_by updateBy
+        from papla_wf_run_ins_attr_value ar
+        where ar.IS_SYS_INNER = #{isSysInner}
+        and exists (select 1 from papla_wf_run_instance xi
+        where ar.instance_id = xi.instance_id
+        and xi.instance_code = #{insCode})
+    </select>
+
+    <!--更新【流程实体属性值】  -->
+    <update id="updateInsEntityAttrValue" parameterType="com.papla.cloud.workflow.engine.modal.InstanceEntityAttrBean">
+        update papla_wf_run_ins_attr_value
+        set attr_result = #{attrResult,jdbcType=VARCHAR},
+        update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        update_by = #{updateBy,jdbcType=VARCHAR}
+        where instance_id = #{instanceId}
+        and attr_id = #{attrId}
+    </update>
+
+    <!-- 清除【流程实体属性值】  -->
+    <delete id="clearEntityAttrByInsId" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_attr_value
+        where instance_id =#{insId}
+        <![CDATA[
+			and attr_code <> 'e_submitter'
+			and attr_code <> 'e_submit_date'
+			and attr_code <> 'e_submitter_name'		  
+		  ]]>
+    </delete>
+
+    <!--  获取值集表中的【流程内置属性】  -->
+    <select id="getInnerEntityAttrs" parameterType="java.lang.String" resultType="com.papla.cloud.workflow.engine.modal.PubValSetBean">
+       select t.ID dtlId,
+            t.DICT_CODE valCode,
+            t.DICT_VALUE dtlCode,
+            t.DICT_LABEL dtlName,
+            t.DESCRIPTION dtlDesc,
+            t.ENABLED dtlEnable
+        from papla_wf_dict_val t
+        where t.DICT_CODE = #{valCode}
+        and t.ENABLED = 'Y'
+    </select>
+
+    <!-- 查询单个【流程实体属性值】信息  -->
+    <select id="getInsSingleEntityAttrValue" parameterType="java.util.Map" resultType="java.lang.String">
+        select t.attr_result
+        from papla_wf_run_ins_attr_value t
+        where t.INSTANCE_ID = #{insId}
+        and t.ATTR_CODE = #{attrCode}
+    </select>
+
+</mapper>

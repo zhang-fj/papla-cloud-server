@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployActPVEnumMapper">
+
+    <!-- 批量保存【流程节点属性枚举】信息 -->
+    <insert id="saveActivityPvEnum" parameterType="java.util.List">
+        insert into papla_wf_deploy_act_pv_enum (
+        value_id, act_id, deploy_id , property_code, executor_type, executor_value, create_by, create_dt
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.valueId,jdbcType=VARCHAR},
+            #{item.actId,jdbcType=VARCHAR},
+            #{item.deployId,jdbcType=VARCHAR},
+            #{item.propertyCode,jdbcType=VARCHAR},
+            #{item.executorType,jdbcType=VARCHAR},
+            #{item.executorValue,jdbcType=VARCHAR},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=TIMESTAMP}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 删除【流程节点枚举属性】信息 -->
+    <delete id="deleteActivityPvEnum" parameterType="java.lang.String">
+        delete from work_flow_act_pv_enum where act_id = #{actId}
+    </delete>
+
+    <!-- 根据【节点ID】和【流程部署ID】获取【枚举属性】信息 -->
+    <select id="getActivityPVEnumList" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.PVEnumBean">
+        select pv.value_id valueId,
+        pv.act_id actId,
+        pv.property_code propertyCode,
+        pv.executor_type executorType,
+        pv.executor_value executorValue
+        from papla_wf_deploy_act_pv_enum pv
+        where pv.deploy_id = #{deployId}
+        and pv.act_id = #{actId}
+    </select>
+
+</mapper>

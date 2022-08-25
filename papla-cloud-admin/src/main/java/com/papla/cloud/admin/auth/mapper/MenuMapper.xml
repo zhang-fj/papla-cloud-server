@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.auth.mapper.MenuMapper">
+
+	<sql id="columns">
+		T.ID id ,
+		T.PID pid ,
+		T.TYPE type ,
+		T.TITLE title ,
+		T.NAME name ,
+		T.COMPONENT component ,
+		T.MENU_SORT menuSort ,
+		T.ICON icon ,
+		T.PATH path ,
+		T.I_FRAME iFrame ,
+		T.CACHE cache ,
+		T.HIDDEN hidden ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_auth_menu T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.auth.domain.Menu" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/>,
+			(select count(1) from papla_auth_menu S where T.ID = S.PID ) subCount
+		from papla_auth_menu T where 1=1
+		<if test="pid != null and pid != ''"> and T.PID = #{pid,jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''">
+            and exists(
+                select 1 from papla_auth_user_role ur,papla_auth_role_menu rm ,papla_auth_role ar
+                where T.id = rm.menu_id and  ar.enabled = 'Y' and ur.user_id = #{userId,jdbcType=VARCHAR} and ur.role_id = rm.role_id and rm.role_id = ar.id
+            )
+        </if>
+        <if test="types != null">
+            <foreach collection="types" item="type" index="index" open=" and T.TYPE in(" close=")" separator=",">
+                #{type,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        order by T.MENU_SORT
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.auth.domain.Menu" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_menu T
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.auth.domain.Menu" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_menu T
+		where 1=1
+	</select>
+
+	<!-- 添加一条数据 -->
+	<insert id="insert" parameterType="com.papla.cloud.admin.auth.domain.Menu">
+		insert into papla_auth_menu
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	 		<if test="id != null">ID,</if>
+	 		<if test="pid != null">PID,</if>
+	 		<if test="type != null">TYPE,</if>
+	 		<if test="title != null">TITLE,</if>
+	 		<if test="name != null">NAME,</if>
+	 		<if test="component != null">COMPONENT,</if>
+	 		<if test="menuSort != null">MENU_SORT,</if>
+	 		<if test="icon != null">ICON,</if>
+	 		<if test="path != null">PATH,</if>
+	 		<if test="iFrame != null">I_FRAME,</if>
+	 		<if test="cache != null">CACHE,</if>
+	 		<if test="hidden != null">HIDDEN,</if>
+	 		<if test="createDt != null">CREATE_DT,</if>
+	 		<if test="createBy != null">CREATE_BY,</if>
+	 		<if test="updateDt != null">UPDATE_DT,</if>
+	 		<if test="updateBy != null">UPDATE_BY,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id,jdbcType=VARCHAR},</if>
+			<if test="pid != null">#{pid,jdbcType=VARCHAR},</if>
+			<if test="type != null">#{type,jdbcType=VARCHAR},</if>
+			<if test="title != null">#{title,jdbcType=VARCHAR},</if>
+			<if test="name != null">#{name,jdbcType=VARCHAR},</if>
+			<if test="component != null">#{component,jdbcType=VARCHAR},</if>
+			<if test="menuSort != null">#{menuSort,jdbcType=INTEGER},</if>
+			<if test="icon != null">#{icon,jdbcType=VARCHAR},</if>
+			<if test="path != null">#{path,jdbcType=VARCHAR},</if>
+			<if test="iFrame != null">#{iFrame,jdbcType=VARCHAR},</if>
+			<if test="cache != null">#{cache,jdbcType=VARCHAR},</if>
+			<if test="hidden != null">#{hidden,jdbcType=VARCHAR},</if>
+			<if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+			<if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改一条数据 -->
+	<update id="update" parameterType="com.papla.cloud.admin.auth.domain.Menu">
+		update papla_auth_menu T
+		<set>
+			<if test="id != null">ID = #{id,jdbcType=VARCHAR},</if>
+			<if test="pid != null">PID = #{pid,jdbcType=VARCHAR},</if>
+			<if test="type != null">TYPE = #{type,jdbcType=VARCHAR},</if>
+			<if test="title != null">TITLE = #{title,jdbcType=VARCHAR},</if>
+			<if test="name != null">NAME = #{name,jdbcType=VARCHAR},</if>
+			<if test="component != null">COMPONENT = #{component,jdbcType=VARCHAR},</if>
+			<if test="menuSort != null">MENU_SORT = #{menuSort,jdbcType=INTEGER},</if>
+			<if test="icon != null">ICON = #{icon,jdbcType=VARCHAR},</if>
+			<if test="path != null">PATH = #{path,jdbcType=VARCHAR},</if>
+			<if test="iFrame != null">I_FRAME = #{iFrame,jdbcType=VARCHAR},</if>
+			<if test="cache != null">CACHE = #{cache,jdbcType=VARCHAR},</if>
+			<if test="hidden != null">HIDDEN = #{hidden,jdbcType=VARCHAR},</if>
+			<if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+			<if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+		</set>
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</update>
+
+	<!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_auth_menu where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_auth_menu where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.auth.domain.Menu">
+		delete from papla_auth_menu 
+		where  ID = #{id,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>

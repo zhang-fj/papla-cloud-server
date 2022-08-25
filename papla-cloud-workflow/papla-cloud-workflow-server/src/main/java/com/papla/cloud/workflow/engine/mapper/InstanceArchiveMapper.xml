@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.InstanceArchiveMapper">
+
+    <!-- 归档实例信息 -->
+    <insert id="insertArchInstance" parameterType="java.lang.String">
+        insert into papla_wf_arch_instance
+        (
+        instance_id,
+        app_id,
+        app_code,
+        entity_id,
+        entity_code,
+        process_id,
+        deploy_id,
+        process_code,
+        process_name,
+        process_version,
+        process_desc,
+        instance_code,
+        instance_title,
+        instance_state,
+        begin_date,
+        end_date,
+        business_id,
+        business_code,
+        business_name,
+        business_status,
+        auto_dis_avoid_strategy,
+        process_json,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        )
+        select
+        instance_id,
+        app_id,
+        app_code,
+        entity_id,
+        entity_code,
+        process_id,
+        deploy_id,
+        process_code,
+        process_name,
+        process_version,
+        process_desc,
+        instance_code,
+        instance_title,
+        instance_state,
+        begin_date,
+        end_date,
+        business_id,
+        business_code,
+        business_name,
+        business_status,
+        auto_dis_avoid_strategy,
+        process_json,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        from papla_wf_run_instance
+        where instance_id = #{instanceId}
+    </insert>
+
+    <!-- 归档实例属性信息 -->
+    <insert id="insertArchInsAttrValue" parameterType="java.lang.String">
+        insert into papla_wf_arch_ins_attr_value
+        (
+        instance_id,
+        entity_id,
+        attr_id,
+        attr_code,
+        attr_name,
+        attr_category,
+        func_type,
+        func_value,
+        attr_result,
+        attr_desc,
+        attr_data_type,
+        is_sys_inner,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        )
+        select
+        instance_id,
+        entity_id,
+        attr_id,
+        attr_code,
+        attr_name,
+        attr_category,
+        func_type,
+        func_value,
+        attr_result,
+        attr_desc,
+        attr_data_type,
+        is_sys_inner,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        from papla_wf_run_ins_attr_value
+        where instance_id = #{instanceId}
+    </insert>
+
+    <!-- 归档节点状态信息 -->
+    <insert id="insertArchInsActState" parameterType="java.lang.String">
+        insert into papla_wf_arch_ins_act_state
+        (
+        instance_id,
+        act_id,
+        act_state,
+        begin_date,
+        end_date,
+        orderby,
+        is_last_status,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        )
+        select
+        instance_id,
+        act_id,
+        act_state,
+        begin_date,
+        end_date,
+        orderby,
+        is_last_status,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        from papla_wf_run_ins_act_state
+        where instance_id = #{instanceId}
+    </insert>
+
+    <!-- 归档连线状态信息 -->
+    <insert id="insertArchInsTransState" parameterType="java.lang.String">
+        insert into papla_wf_arch_ins_trans_state
+        (
+        instance_id,
+        transition_id,
+        transition_state,
+        biz_status,
+        orderby,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        )
+        select
+        instance_id,
+        transition_id,
+        transition_state,
+        biz_status,
+        orderby,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        from papla_wf_run_ins_trans_state
+        where instance_id = #{instanceId}
+    </insert>
+
+    <!-- 归档待办信息 -->
+    <insert id="insertArchInsTask" parameterType="java.lang.String">
+        insert into papla_wf_arch_ins_task
+        (
+        task_id,
+        deploy_id,
+        process_id,
+        process_code,
+        process_version,
+        instance_id,
+        instance_code,
+        act_id,
+        act_code,
+        act_name,
+        task_title,
+        from_user,
+        assign_user,
+        execute_user,
+        task_state,
+        from_task_id,
+        begin_date,
+        end_date,
+        approve_comment,
+        description,
+        close_cause,
+        create_type,
+        auth_src,
+        auth_src_id,
+        task_owner,
+        result,
+        task_effective,
+        closed_line_type,
+        is_custom_task,
+        is_timeout_task,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by,
+        comment
+        )
+        select
+        task_id,
+        deploy_id,
+        process_id,
+        process_code,
+        process_version,
+        instance_id,
+        instance_code,
+        act_id,
+        act_code,
+        act_name,
+        task_title,
+        from_user,
+        assign_user,
+        execute_user,
+        task_state,
+        from_task_id,
+        begin_date,
+        end_date,
+        approve_comment,
+        description,
+        close_cause,
+        create_type,
+        auth_src,
+        auth_src_id,
+        task_owner,
+        result,
+        task_effective,
+        closed_line_type,
+        is_custom_task,
+        is_timeout_task,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by,
+        comment
+        from papla_wf_run_ins_task
+        where instance_id = #{instanceId}
+    </insert>
+
+    <!-- 归档流程实例动态通知节点审批队列信息 -->
+    <insert id="insertArchInsActQueue" parameterType="java.lang.String">
+        insert into papla_wf_arch_ins_act_queue
+        (
+        queue_id,
+        instance_code,
+        act_code,
+        orderby,
+        node_name,
+        task_title,
+        approver,
+        approve_status,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        )
+        select
+        queue_id,
+        instance_code,
+        act_code,
+        orderby,
+        node_name,
+        task_title,
+        approver,
+        approve_status,
+        create_dt,
+        create_by,
+        update_dt,
+        update_by
+        from papla_wf_run_ins_act_queue
+        where instance_code = (select instance_code from papla_wf_run_instance where instance_id = #{instanceId})
+    </insert>
+
+    <!-- 删除待办信息  -->
+    <delete id="deleteInsTask" parameterType="java.lang.String">
+        DELETE FROM papla_wf_run_ins_task WHERE INSTANCE_ID = #{instanceId}
+    </delete>
+
+    <!-- 删除流程实例节点状态 -->
+    <delete id="deleteInsActState" parameterType="java.lang.String">
+        DELETE FROM papla_wf_run_ins_act_state WHERE INSTANCE_ID = #{instanceId}
+    </delete>
+
+    <!-- 删除流程实例连线状态 -->
+    <delete id="deleteInsTransState" parameterType="java.lang.String">
+        DELETE FROM papla_wf_run_ins_trans_state WHERE INSTANCE_ID = #{instanceId}
+    </delete>
+
+    <!-- 删除流程实例实体属性 -->
+    <delete id="deleteInsAttrValues" parameterType="java.lang.String">
+        DELETE FROM papla_wf_run_ins_attr_value WHERE INSTANCE_ID = #{instanceId}
+    </delete>
+
+    <!-- 删除流程实例 -->
+    <delete id="deleteProcessInstance" parameterType="java.lang.String">
+        DELETE FROM papla_wf_run_instance WHERE INSTANCE_ID = #{instanceId}
+    </delete>
+
+    <!-- 删除流程实例动态通知节点审批队列信息 -->
+    <delete id="deleteDynaActQueue" parameterType="java.lang.String">
+        delete from papla_wf_run_ins_act_queue
+        where instance_code = (select instance_code
+        from papla_wf_run_instance
+        where instance_id = #{instanceId})
+    </delete>
+
+    <!-- 删除归档实例信息 -->
+    <delete id="deleteArchInstance" parameterType="java.lang.String">
+        delete from papla_wf_arch_instance where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 删除归档实例属性信息 -->
+    <delete id="deleteArchInsAttrValue" parameterType="java.lang.String">
+        delete from papla_wf_arch_ins_attr_value where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 删除归档节点状态信息 -->
+    <delete id="deleteArchInsActState" parameterType="java.lang.String">
+        delete from papla_wf_arch_ins_act_state where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 删除归档连线状态信息  -->
+    <delete id="deleteArchInsTransState" parameterType="java.lang.String">
+        delete from papla_wf_arch_ins_trans_state where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 删除归档待办信息 -->
+    <delete id="deleteArchInsTask" parameterType="java.lang.String">
+        delete from papla_wf_arch_ins_task where instance_id = #{instanceId}
+    </delete>
+
+    <!-- 删除归档流程实例动态通知节点审批队列信息 -->
+    <delete id="deleteArchInsActQueue" parameterType="java.lang.String">
+        delete from papla_wf_arch_ins_act_queue where instance_code = #{instanceCode}
+    </delete>
+
+</mapper>

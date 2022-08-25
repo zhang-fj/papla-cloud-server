@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.papla.cloud</groupId>
+    <artifactId>papla-cloud</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>papla-cloud-common</artifactId>
+  <packaging>pom</packaging>
+  
+  <modules>
+   	<module>papla-cloud-common-redis</module>
+   	<module>papla-cloud-common-mybatis</module>
+   	<module>papla-cloud-common-security</module>
+    <module>papla-cloud-common-core</module>
+    <module>papla-cloud-common-web</module>
+    <module>papla-cloud-common-swagger</module>
+    <module>papla-cloud-common-jpa</module>
+    <module>papla-cloud-common-logging</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <swagger.version>1.6.2</swagger.version>
+  </properties>
+  
+   <dependencies>
+
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<!-- excel工具 -->
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.17</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>3.17</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>xerces</groupId>
+		    <artifactId>xercesImpl</artifactId>
+		    <version>2.12.0</version>
+		</dependency>
+
+   </dependencies>
+    
+</project>

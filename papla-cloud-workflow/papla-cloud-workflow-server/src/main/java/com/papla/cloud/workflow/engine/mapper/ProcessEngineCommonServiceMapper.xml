@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessEngineCommonServiceMapper">
+
+    <!-- 判断是否为当前节点的最后一个审批人 -->
+    <select id="isLastApprover" parameterType="java.util.Map" resultType="java.lang.Integer">
+        <![CDATA[
+			select count(1) as total
+		    from work_flow_ins_task t
+		   where t.instance_id = #{instanceId}
+		     and t.task_state = #{taskState}
+		     and t.task_id <> #{currentTaskId}
+		     and t.act_id = #{actId}
+	     ]]>
+    </select>
+
+    <!-- 查询实例下节点待办信息 -->
+    <select id="getTasks" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.WorkItemBean">
+        select t.task_id taskId,
+        t.task_state taskState,
+        t.closed_line_type closedLineType,
+        t.act_id actId,
+        t.instance_id instanceId,
+        t.process_id processId,
+        t.process_version processVersion
+        from work_flow_ins_task t
+        where t.task_effective = 'Y'
+        and t.act_id = #{actId}
+        and t.instance_id = #{insId}
+    </select>
+
+</mapper>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.RunInstanceMapper">
+
+    <!-- 创建【流程实例】 -->
+    <insert id="saveInstance" parameterType="com.papla.cloud.workflow.engine.modal.ProcessInstanceBean">
+        insert into papla_wf_run_instance
+        (
+        app_id,
+        app_code,
+        entity_id,
+        entity_code,
+        process_id,
+        deploy_id,
+        process_code,
+        process_name,
+        process_version,
+        process_json,
+        instance_id,
+        instance_code,
+        instance_title,
+        instance_state,
+        begin_date,
+        end_date,
+        process_desc,
+        business_id,
+        business_code,
+        business_name,
+        business_status,
+        auto_dis_avoid_strategy,
+        create_dt,
+        create_by
+        )
+        (select
+        a.app_id,
+        a.app_code,
+        b.entity_id,
+        b.entity_code,
+        c.process_id,
+        c.deploy_id,
+        c.process_code,
+        process_name,
+        c.process_version,
+        c.process_json,
+        #{instanceId,jdbcType=VARCHAR},
+        #{instanceCode,jdbcType=VARCHAR},
+        c.process_name ,
+        #{instanceState,jdbcType=VARCHAR},
+        #{beginDate,jdbcType=TIMESTAMP},
+        #{endDate,jdbcType=TIMESTAMP},
+        #{processDesc,jdbcType=VARCHAR},
+        #{businessId,jdbcType=VARCHAR},
+        #{businessCode,jdbcType=VARCHAR},
+        #{businessName,jdbcType=VARCHAR},
+        #{currentBizState,jdbcType=VARCHAR},
+        #{autoDisabledAvoidStrategy,jdbcType=VARCHAR},
+        #{createDt,jdbcType=TIMESTAMP},
+        #{createBy,jdbcType=VARCHAR}
+        from papla_wf_apps a, papla_wf_entities b, papla_wf_proc_deploy c
+        where a.app_id = b.app_id
+        and b.entity_id = c.entity_id
+        and c.deploy_id = #{deployId}
+        )
+    </insert>
+
+    <!--修改【流程实例】状态  -->
+    <update id="updateInstanceState" parameterType="java.util.HashMap">
+        update papla_wf_run_instance
+        set instance_state = #{instanceState,jdbcType=VARCHAR},
+        end_date = #{endDate,jdbcType=TIMESTAMP},
+        update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        update_by = #{updateBy,jdbcType=VARCHAR}
+        where instance_id = #{instanceId}
+    </update>
+
+    <!-- 更新【流程实例】对应的【业务信息】  -->
+    <update id="updateInstanceBusiness" parameterType="java.util.HashMap">
+        update papla_wf_run_instance t
+        set
+        t.business_id = #{businessId,jdbcType=VARCHAR},
+        t.business_code = #{businessCode,jdbcType=VARCHAR},
+        t.business_name = #{businessName,jdbcType=VARCHAR},
+        t.update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        t.update_by = #{updateBy,jdbcType=VARCHAR}
+        where t.instance_id = #{instanceId}
+    </update>
+
+    <!-- 更新【流程实例】对应的【业务状态】  -->
+    <update id="updateBizState" parameterType="java.util.HashMap">
+        update papla_wf_run_instance t
+        set
+        t.business_status = #{bizStatus,jdbcType=VARCHAR},
+        t.update_dt = #{updateDt,jdbcType=TIMESTAMP},
+        t.update_by = #{updateBy,jdbcType=VARCHAR}
+        where t.instance_id = #{instanceId}
+    </update>
+
+    <!-- 更新【流程实例】基本信息  -->
+    <update id="modifyInsBaseInfo" parameterType="com.papla.cloud.workflow.engine.modal.ProcessInstanceBean">
+        update papla_wf_run_instance
+        set process_id = #{processId,jdbcType=VARCHAR},
+        deploy_id = #{deployId,jdbcType=VARCHAR},
+        process_code = #{processCode,jdbcType=VARCHAR},
+        process_version = #{processVersion,jdbcType=INTEGER},
+        process_desc = #{processDesc,jdbcType=VARCHAR},
+        instance_title = #{instanceTitle,jdbcType=VARCHAR},
+        instance_state = #{instanceState,jdbcType=VARCHAR},
+        begin_date = #{beginDate,jdbcType=TIMESTAMP},
+        end_date = #{endDate,jdbcType=TIMESTAMP},
+        business_id = #{businessId,jdbcType=VARCHAR},
+        business_code = #{businessCode,jdbcType=VARCHAR},
+        business_name = #{businessName,jdbcType=VARCHAR},
+        app_id = #{appId,jdbcType=VARCHAR},
+        app_code = #{appCode,jdbcType=VARCHAR},
+        entity_id = #{entityId,jdbcType=VARCHAR},
+        entity_code = #{entityCode,jdbcType=VARCHAR},
+        business_status = #{currentBizState,jdbcType=VARCHAR},
+        auto_dis_avoid_strategy = #{autoDisabledAvoidStrategy,jdbcType=VARCHAR},
+        update_dt = #{currentDate,jdbcType=TIMESTAMP},
+        update_by = #{currentUserId,jdbcType=VARCHAR},
+        process_json = #{processJson,jdbcType=CLOB}
+        where instance_id = #{instanceId}
+    </update>
+
+    <!-- 获取【流程实例】基本信息 -->
+    <select id="getBaseInstanceBean" parameterType="java.util.Map"
+            resultType="com.papla.cloud.workflow.engine.modal.ProcessInstanceBean">
+        select
+        ins.instance_id instanceId,
+        ins.app_id appId,
+        ins.app_code appCode,
+        ins.entity_id entityId,
+        ins.entity_code entityCode,
+        ins.process_id processId,
+        ins.deploy_id deployId,
+        ins.process_code processCode,
+        ins.process_name processName,
+        ins.process_version processVersion,
+        ins.process_desc processDesc,
+        ins.instance_code instanceCode,
+        ins.instance_title instanceTitle,
+        ins.instance_state instanceState,
+        ins.begin_date beginDate,
+        ins.end_date endDate,
+        ins.business_id businessId,
+        ins.business_code businessCode,
+        ins.business_name businessName,
+        ins.business_status businessStatus,
+        ins.auto_dis_avoid_strategy autoDisabledAvoidStrategy,
+        (case ins.auto_dis_avoid_strategy when 'Y' then 1 else 0 end) isExistsLoop,
+        ins.process_json processJson,
+        ins.create_dt createDt,
+        ins.create_by createBy,
+        ins.update_dt updateDt,
+        ins.update_by updateBy
+        from
+        <choose>
+            <when test='arch == "Y"'>
+                papla_wf_arch_instance ins
+            </when>
+            <otherwise>
+                papla_wf_run_instance ins
+            </otherwise>
+        </choose>
+        where 1=1
+        <choose>
+            <when test='instanceId != null and instanceId != ""'>
+                and ins.instance_id = #{instanceId}
+            </when>
+            <when test='instanceCode != null and instanceCode != ""'>
+                and ins.instance_code = #{instanceCode}
+            </when>
+            <when test='taskId != null and taskId != ""'>
+                and ins.instance_id =
+                (select a.instance_id from
+                <choose>
+                    <when test='arch == "Y"'>
+                        papla_wf_arch_ins_task a
+                    </when>
+                    <otherwise>
+                        papla_wf_run_ins_task a
+                    </otherwise>
+                </choose>
+
+                where a.task_id = #{taskId}
+                )
+            </when>
+            <otherwise>
+                and 1 != 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 根据【流程任务ID】查询【流程实例ID】 -->
+    <select id="getRunInstanceIdByTaskId" parameterType="java.lang.String" resultType="java.lang.String">
+        select t.instance_id from papla_wf_run_ins_task t where t.task_id = #{taskId}
+    </select>
+
+    <!-- 获取【流程实例】状态信息 -->
+    <select id="getInstanceState" parameterType="java.lang.String" resultType="java.lang.String">
+        select t.instance_state from papla_wf_run_instance t where t.instance_code = #{instanceCode}
+    </select>
+
+</mapper>

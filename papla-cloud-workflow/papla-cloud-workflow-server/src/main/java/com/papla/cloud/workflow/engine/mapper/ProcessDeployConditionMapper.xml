@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.papla.cloud.workflow.engine.mapper.ProcessDeployConditionMapper">
+
+
+    <!-- 批量保存【流程】或【节点】属性条件单元 -->
+    <insert id="saveCondtionBean" parameterType="java.util.List">
+        insert into papla_wf_deploy_cond (
+        group_id, condition_id, condition_num, left_bracket, left_exp, operators, exp_type, right_exp, right_bracket,
+        join_operators, create_by, create_dt
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{item.groupId,jdbcType=VARCHAR},
+            #{item.conditionId,jdbcType=VARCHAR},
+            #{item.conditionNum,jdbcType=INTEGER},
+            #{item.leftBracket,jdbcType=VARCHAR},
+            #{item.leftExp,jdbcType=VARCHAR},
+            #{item.operators,jdbcType=VARCHAR},
+            #{item.expType,jdbcType=VARCHAR},
+            #{item.rightExp,jdbcType=VARCHAR},
+            #{item.rightBracket,jdbcType=VARCHAR},
+            #{item.joinOperators,jdbcType=VARCHAR},
+            #{item.createBy,jdbcType=VARCHAR},
+            #{item.createDt,jdbcType=DATE}
+            from wb_dual)
+        </foreach>
+    </insert>
+
+    <!-- 获取【流程】或【节点】属性条件单元 -->
+    <select id="getConditonBeanList" parameterType="java.util.Map" resultType="com.papla.cloud.workflow.engine.modal.ConditionBean">
+        select con.group_id groupId,
+        con.condition_id conditionId,
+        con.condition_num conditionNum,
+        con.left_bracket leftBracket,
+        con.left_exp leftExp,
+        con.operators operators,
+        con.exp_type expType,
+        con.right_exp rightExp,
+        con.right_bracket rightBracket,
+        con.join_operators joinOperators,
+        con.create_by createBy,
+        con.update_by updateBy,
+        con.create_dt createDate,
+        con.update_dt updateDt
+        from papla_wf_deploy_cond con
+        where con.group_id = #{groupId}
+        <choose>
+            <when test=" dbType == 'oracle' ">
+                order by to_number(con.condition_num)
+            </when>
+            <when test=" dbType == 'mysql' ">
+                order by cast(con.condition_num as unsigned )
+            </when>
+        </choose>
+    </select>
+
+</mapper>

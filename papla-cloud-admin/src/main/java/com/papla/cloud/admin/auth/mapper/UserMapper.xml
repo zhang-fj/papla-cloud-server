@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.papla.cloud.admin.auth.mapper.UserMapper">
+
+	<sql id="columns">
+		T.ID id ,
+		T.EMP_ID empId ,
+		T.USERNAME username ,
+		T.PASSWORD password ,
+		T.EMP_CODE empCode ,
+		T.EMP_NAME empName ,
+		T.NICK_NAME nickName ,
+		T.GENDER gender ,
+		T.USER_TYPE userType ,
+		T.FIXED_PHONE fixedPhone ,
+		T.MOBILE_PHONE mobilePhone ,
+		T.EMAIL email ,
+		T.START_DATE startDate ,
+		T.END_DATE endDate ,
+		T.HAS_RESET_PWD hasResetPwd ,
+		T.PWD_RESET_TIME pwdResetTime ,
+		T.ENABLED enabled ,
+		T.CREATE_DT createDt ,
+		T.CREATE_BY createBy ,
+		T.UPDATE_DT updateDt ,
+		T.UPDATE_BY updateBy 
+	</sql>
+
+	<!-- 根据查询信息获取信息总数量 -->
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from papla_auth_user T where 1=1
+	</select>
+
+	<!-- 根据参数查询所有数据 -->
+	<select id="findAll" resultType="com.papla.cloud.admin.auth.domain.User" parameterType="java.util.Map">
+		select 
+			<include refid="columns"/> 
+		from papla_auth_user T where 1=1
+        <if test="username != null and username != ''"> and T.USERNAME like concat('%',#{username,jdbcType=VARCHAR},'%')</if>
+        <if test="userType != null and userType != ''"> and T.USER_TYPE = #{userType,jdbcType=VARCHAR}</if>
+        <if test="fixedPhone != null and fixedPhone != ''"> and T.FIXED_PHONE like concat('%',#{fixedPhone,jdbcType=VARCHAR},'%')</if>
+        <if test="mobilePhone != null and mobilePhone != ''"> and T.MOBILE_PHONE like concat('%',#{mobilePhone,jdbcType=VARCHAR},'%')</if>
+        <if test="email != null and email != ''"> and T.EMAIL like concat('%',#{email,jdbcType=VARCHAR},'%')</if>
+        <if test="enabled != null and enabled != ''"> and T.ENABLED = #{enabled,jdbcType=VARCHAR}</if>
+	</select>
+
+	<!-- 根据id获取一条数据-->
+	<select id="selectByPK" resultType="com.papla.cloud.admin.auth.domain.User" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_user T
+		where  T.ID = #{id,jdbcType=VARCHAR}  
+	</select>
+
+	<!-- 根据参数获取一条数据 -->
+	<select id="selectByPropertys" resultType="com.papla.cloud.admin.auth.domain.User" parameterType="java.util.Map">
+		select
+			<include refid="columns"/>
+		from papla_auth_user T
+		where 1=1 and T.USERNAME = #{username,jdbcType=VARCHAR}
+	</select>
+
+    <!-- 添加一条数据 -->
+    <insert id="insert" parameterType="com.papla.cloud.admin.auth.domain.User">
+        insert into papla_auth_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">ID,</if>
+            <if test="empId != null">EMP_ID,</if>
+            <if test="username != null">USERNAME,</if>
+            <if test="password != null">PASSWORD,</if>
+            <if test="empCode != null">EMP_CODE,</if>
+            <if test="empName != null">EMP_NAME,</if>
+            <if test="nickName != null">NICK_NAME,</if>
+            <if test="gender != null">GENDER,</if>
+            <if test="userType != null">USER_TYPE,</if>
+            <if test="fixedPhone != null">FIXED_PHONE,</if>
+            <if test="mobilePhone != null">MOBILE_PHONE,</if>
+            <if test="email != null">EMAIL,</if>
+            <if test="startDate != null">START_DATE,</if>
+            <if test="endDate != null">END_DATE,</if>
+            <if test="hasResetPwd != null">HAS_RESET_PWD,</if>
+            <if test="pwdResetTime != null">PWD_RESET_TIME,</if>
+            <if test="enabled != null">ENABLED,</if>
+            <if test="createDt != null">CREATE_DT,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="updateDt != null">UPDATE_DT,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=VARCHAR},</if>
+            <if test="empId != null">#{empId,jdbcType=VARCHAR},</if>
+            <if test="username != null">#{username,jdbcType=VARCHAR},</if>
+            <if test="password != null">#{password,jdbcType=VARCHAR},</if>
+            <if test="empCode != null">#{empCode,jdbcType=VARCHAR},</if>
+            <if test="empName != null">#{empName,jdbcType=VARCHAR},</if>
+            <if test="nickName != null">#{nickName,jdbcType=VARCHAR},</if>
+            <if test="gender != null">#{gender,jdbcType=VARCHAR},</if>
+            <if test="userType != null">#{userType,jdbcType=VARCHAR},</if>
+            <if test="fixedPhone != null">#{fixedPhone,jdbcType=VARCHAR},</if>
+            <if test="mobilePhone != null">#{mobilePhone,jdbcType=VARCHAR},</if>
+            <if test="email != null">#{email,jdbcType=VARCHAR},</if>
+            <if test="startDate != null">#{startDate,jdbcType=TIMESTAMP},</if>
+            <if test="endDate != null">#{endDate,jdbcType=TIMESTAMP},</if>
+            <if test="hasResetPwd != null">#{hasResetPwd,jdbcType=VARCHAR},</if>
+            <if test="pwdResetTime != null">#{pwdResetTime,jdbcType=TIMESTAMP},</if>
+            <if test="enabled != null">#{enabled,jdbcType=VARCHAR},</if>
+            <if test="createDt != null">#{createDt,jdbcType=TIMESTAMP},</if>
+            <if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">#{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改一条数据 -->
+    <update id="update" parameterType="com.papla.cloud.admin.auth.domain.User">
+        update papla_auth_user T
+        <set>
+            <if test="empId != null">EMP_ID = #{empId,jdbcType=VARCHAR},</if>
+            <if test="username != null">USERNAME = #{username,jdbcType=VARCHAR},</if>
+            <if test="password != null">PASSWORD = #{password,jdbcType=VARCHAR},</if>
+            <if test="empCode != null">EMP_CODE = #{empCode,jdbcType=VARCHAR},</if>
+            <if test="empName != null">EMP_NAME = #{empName,jdbcType=VARCHAR},</if>
+            <if test="nickName != null">NICK_NAME = #{nickName,jdbcType=VARCHAR},</if>
+            <if test="gender != null">GENDER = #{gender,jdbcType=VARCHAR},</if>
+            <if test="userType != null">USER_TYPE = #{userType,jdbcType=VARCHAR},</if>
+            <if test="fixedPhone != null">FIXED_PHONE = #{fixedPhone,jdbcType=VARCHAR},</if>
+            <if test="mobilePhone != null">MOBILE_PHONE = #{mobilePhone,jdbcType=VARCHAR},</if>
+            <if test="email != null">EMAIL = #{email,jdbcType=VARCHAR},</if>
+            <if test="startDate != null">START_DATE = #{startDate,jdbcType=TIMESTAMP},</if>
+            <if test="endDate != null">END_DATE = #{endDate,jdbcType=TIMESTAMP},</if>
+            <if test="hasResetPwd != null">HAS_RESET_PWD = #{hasResetPwd,jdbcType=VARCHAR},</if>
+            <if test="pwdResetTime != null">PWD_RESET_TIME = #{pwdResetTime,jdbcType=TIMESTAMP},</if>
+            <if test="enabled != null">ENABLED = #{enabled,jdbcType=VARCHAR},</if>
+            <if test="updateDt != null">UPDATE_DT = #{updateDt,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy,jdbcType=VARCHAR},</if>
+        </set>
+        where  T.ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据参数删除 -->
+	<delete id="deleteByParams" parameterType="java.util.Map">
+		delete from papla_auth_user where 1=1
+	</delete>
+	
+	<!-- 根据ids数组删除 -->
+	<delete id="deleteByIds" parameterType="java.util.Map">
+		delete from papla_auth_user where 1=1
+		<foreach collection="list" item="id" index="index" open=" and ID in(" close=")" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<!-- 根据实体删除一条数据 -->
+	<delete id="delete" parameterType="com.papla.cloud.admin.auth.domain.User">
+		delete from papla_auth_user 
+		where  ID = #{id,jdbcType=VARCHAR}  
+	</delete>
+
+</mapper>
